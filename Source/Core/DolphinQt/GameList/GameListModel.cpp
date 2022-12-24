@@ -263,6 +263,12 @@ bool GameListModel::ShouldDisplayGameListItem(int index) const
     return false;
   }
 
+  std::string MSCGameID = "R4Q";
+  if (!game.GetGameID().starts_with(MSCGameID))
+  {
+    return false;
+  }
+
   const bool show_platform = [&game] {
     switch (game.GetPlatform())
     {
