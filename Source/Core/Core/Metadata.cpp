@@ -47,7 +47,7 @@ std::string Metadata::getJSONString()
   strftime(date_string, 50, "%B %d %Y %OH:%OM:%OS", matchDateTime);
   strftime(file_name, 50, "%B_%d_%Y_%OH_%OM_%OS", matchDateTime);
   std::string convertedDate(file_name);
-  std::string file_name_string = "Game_" + convertedDate + ".cit";
+  std::string file_name_string = "Game_" + convertedDate + ".boo";
 
   std::stringstream json_stream;
   json_stream << "{" << std::endl;
@@ -74,34 +74,6 @@ std::string Metadata::getJSONString()
                   << std::to_string(controllerVector.at(i)) << std::endl;
     }
   }
-  json_stream << "   }," << std::endl;
-  json_stream << "  \"Home Captain ID\": \"" << homeCaptainID << "\"," << std::endl;
-  json_stream << "  \"Home Top Wing\": \"" << homeSidekick1 << "\"," << std::endl;
-  json_stream << "  \"Home Bottom Wing\": \"" << homeSidekick2 << "\"," << std::endl;
-  json_stream << "  \"Home Sweeper\": \"" << homeSidekick3 << "\"," << std::endl;
-  json_stream << "  \"Away Captain ID\": \"" << awayCaptainID << "\"," << std::endl;
-  json_stream << "  \"Away Top Wing\": \"" << awaySidekick1 << "\"," << std::endl;
-  json_stream << "  \"Away Bottom Wing\": \"" << awaySidekick2 << "\"," << std::endl;
-  json_stream << "  \"Away Sweeper\": \"" << awaySidekick3 << "\"," << std::endl;
-  json_stream << "  \"Score\": \"" << homeScore << "-" << awayScore << "\"," << std::endl;
-  json_stream << "  \"Stadium ID\": \"" << stadiumID << "\"," << std::endl;
-
-  json_stream << "  \"Home Match Stats\": {" << std::endl;
-  json_stream << "    \"Goals\": \"" << homeScore << "\"," << std::endl;
-  json_stream << "   }," << std::endl;
-
-  json_stream << "  \"Away Match Stats\": {" << std::endl;
-  json_stream << "    \"Goals\": \"" << awayScore << "\"," << std::endl;
-  json_stream << "   }," << std::endl;
-
-  json_stream << "  \"Netplay Match\": \"" << NetPlay::IsNetPlayRunning() << "\"," << std::endl;
-
-  json_stream << "  \"Overtime Not Reached\": \"" << overtimeNotReached << "\"," << std::endl;
-
-  json_stream << "  \"Left Team Frames Possessed Ball\": \"" << homeTeamPossesionFrameCount << "\","
-              << std::endl;
-  json_stream << "  \"Right Team Frames Possessed Ball\": \"" << awayTeamPossesionFrameCount << "\""
-              << std::endl;
 
   json_stream << "}" << std::endl;
 
@@ -110,24 +82,6 @@ std::string Metadata::getJSONString()
 
 void Metadata::writeJSON(std::string jsonString, bool callBatch)
 {
-  // std::string file_path = "C:\\Users\\Brian\\Desktop\\throw dtm here";
-  // file_path += "\\output.json";
-  // std::string file_path;
-  /*
-  PWSTR path;
-  SHGetKnownFolderPath(FOLDERID_Documents, KF_FLAG_DEFAULT, NULL, &path);
-  std::wstring strpath(path);
-  CoTaskMemFree(path);
-  std::string documents_file_path(strpath.begin(), strpath.end());
-  std::string replays_path = "\"";
-  replays_path += documents_file_path;
-  replays_path += "\\Citrus Replays";
-  // "C://Users//Brian//Documents//Citrus Replays
-  std::string json_output_path = documents_file_path + "\\Citrus Replays";
-  json_output_path += "\\output.json";
-  replays_path += "\"";
-  // "C://Users//Brian//Documents//Citrus Replays"
-  */
   std::string improvedReplayPath = File::GetUserPath(D_SPOOKYREPLAYS_IDX) + "output.json";
   File::WriteStringToFile(improvedReplayPath, jsonString);
 
@@ -137,36 +91,7 @@ void Metadata::writeJSON(std::string jsonString, bool callBatch)
     strftime(date_string, 50, "%B_%d_%Y_%OH_%OM_%OS", matchDateTime);
     std::string someDate(date_string);
     std::string gameTime = "Game_" + someDate;
-    /*
-    std::string gameVar = " Game_";
-    gameVar += someDate;
-    // Game_May_05_2022_11_51_34
-    gameVar += " ";
-    gameVar += replays_path;
-    // Game_May_05_2022_11_51_34 C://Users//Brian//Documents//Citrus Replays
-    // we need to pass the path the replays are held in in order to CD into them in the batch file
-    std::filesystem::path cwd = std::filesystem::current_path() / "createcit.bat";
-    std::string pathToBatch = cwd.string();
-    std::string batchPath = "\"\"" + pathToBatch + "\"";
-    //std::string batchPath("./createcit.bat");
-    batchPath += gameVar + "\"";
-    */
-    /*
-    STARTUPINFO si;
-    PROCESS_INFORMATION pi;
-    memset(&si, 0, sizeof(si));
-    si.cb = sizeof(si);
-    //si.wShowWindow = SW_HIDE;
-    // CREATE_NO_WINDOW
-    if (!CreateProcessA(pathToBatch.c_str(), &batchPath[0], NULL, NULL, TRUE, CREATE_NO_WINDOW,
-    NULL, NULL, (LPSTARTUPINFOA)&si, &pi))
-    {
-      // would handle error in here
-    }
-    // the task has ended so close the handle
-    CloseHandle(pi.hThread);
-    CloseHandle(pi.hProcess);
-    */
+    
     // WinExec(batchPath.c_str(), SW_HIDE);
     //  https://stackoverflow.com/questions/11370908/how-do-i-use-minizip-on-zlib
     std::vector<std::wstring> paths;
@@ -191,7 +116,7 @@ void Metadata::writeJSON(std::string jsonString, bool callBatch)
     paths.push_back(std::wstring_convert<std::codecvt_utf8<wchar_t>>().from_bytes(exampleFile1));
     paths.push_back(std::wstring_convert<std::codecvt_utf8<wchar_t>>().from_bytes(exampleFile2));
     paths.push_back(std::wstring_convert<std::codecvt_utf8<wchar_t>>().from_bytes(exampleFile3));
-    std::string zipName = File::GetUserPath(D_SPOOKYREPLAYS_IDX) + gameTime + ".cit ";
+    std::string zipName = File::GetUserPath(D_SPOOKYREPLAYS_IDX) + gameTime + ".boo ";
 
     zipFile zf = zipOpen(zipName.c_str(), APPEND_STATUS_CREATE);
     if (zf == NULL)
