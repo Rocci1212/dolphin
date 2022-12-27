@@ -2,9 +2,9 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include "Core/Core.h"
-//#include "Core/StateAuxillary.h"
+#include "Core/StateAuxillary.h"
 //#include "Core/Metadata.h"
-//#include "Core/DefaultGeckoCodes.h"
+#include "Core/DefaultGeckoCodes.h"
 
 #include <algorithm>
 #include <atomic>
@@ -101,8 +101,16 @@
 #include "jni/AndroidCommon/IDCache.h"
 #endif
 
+#include <Core/HW/SI/SI_Device.h>
+#include <codecvt>
+
 namespace Core
 {
+
+static bool boolMatchStart = false;
+static bool boolMatchEnd = false;
+static bool wroteCodes = false;
+
 static bool s_wants_determinism;
 
 // Declarations and definitions
@@ -163,12 +171,99 @@ void FrameUpdateOnCPUThread()
     NetPlay::NetPlayClient::SendTimeBase();
 }
 
+std::wstring GetEnvString()
+{
+  wchar_t* env = GetEnvironmentStrings();
+  if (!env)
+    abort();
+  const wchar_t* var = env;
+  size_t totallen = 0;
+  size_t len;
+  while ((len = wcslen(var)) > 0)
+  {
+    totallen += len + 1;
+    var += len + 1;
+  }
+  std::wstring result(env, totallen);
+  FreeEnvironmentStrings(env);
+  return result;
+}
+
 void OnFrameEnd()
 {
 #ifdef USE_MEMORYWATCHER
   if (s_memory_watcher)
     s_memory_watcher->Step();
 #endif
+
+    // inject ALWAYS requried replay codes if we're not playing back a recording
+  // we don't want to mess up past save states with current, possibly different, gecko codes
+  if (!StateAuxillary::getBoolWroteCodes() && !Movie::IsPlayingInput())
+  {
+    /*
+    DefaultGeckoCodes codeWriter;
+    codeWriter.RunCodeInject(false);
+    */
+    StateAuxillary::setBoolWroteCodes(true);
+    wroteCodes = true;
+  }
+
+  static const u32 matchStart = 0x80400000;
+  static const u32 matchEnd = 0x80400001;
+  static const u32 grudgeMatchBool = 0x80400003;
+  // overtime is at 0x80400002 so don't use that for anything
+
+  // c2 gecko for hud (800f83bc) must be on to make this happen
+  // movie cannot be playing input back since we do not want to record that
+
+  // match start
+  if (Memory::Read_U8(matchStart) == 1 && !StateAuxillary::getBoolMatchStart() &&
+      !Movie::IsPlayingInput() && !Movie::IsRecordingInput() && !StateAuxillary::isSpectator() &&
+      Memory::Read_U8(grudgeMatchBool) == 1 && Config::Get(Config::MAIN_REPLAYS))
+  {
+    boolMatchStart = true;
+    StateAuxillary::setBoolMatchStart(true);
+    // begin recording
+
+    StateAuxillary::startRecording();
+    StateAuxillary::setBoolMatchEnd(false);
+    boolMatchEnd = false;
+
+    // direcotry gets created from UICommon.cpp now
+  }
+
+  // match end
+  if (Memory::Read_U8(matchEnd) == 1 && !StateAuxillary::getBoolMatchEnd() &&
+      !Movie::IsPlayingInput() && Movie::IsRecordingInput())
+  {
+    StateAuxillary::setBoolMatchEnd(true);
+    boolMatchEnd = true;
+    time_t curr_time;
+    tm* curr_tm;
+    char date_string[100];
+
+    time(&curr_time);
+    curr_tm = localtime(&curr_time);
+    strftime(date_string, 50, "%B_%d_%Y_%OH_%OM_%OS", curr_tm);
+    /*
+    PWSTR path;
+    SHGetKnownFolderPath(FOLDERID_Documents, KF_FLAG_DEFAULT, NULL, &path);
+    std::wstring strpath(path);
+    CoTaskMemFree(path);
+    std::string documents_file_path(strpath.begin(), strpath.end());
+    std::string replays_path = "";
+    replays_path += documents_file_path;
+    replays_path += "\\Citrus Replays";
+    // C://Users//Brian//Documents//Citrus Replays
+    std::string fileName = "\\output.dtm";
+    replays_path += fileName;
+    */
+    std::string uiFileName = File::GetUserPath(D_SPOOKYREPLAYS_IDX) + "output.dtm";
+
+    StateAuxillary::stopRecording(uiFileName, curr_tm);
+    StateAuxillary::setBoolMatchStart(false);
+    boolMatchStart = false;
+  }
 }
 
 // Display messages and return values
