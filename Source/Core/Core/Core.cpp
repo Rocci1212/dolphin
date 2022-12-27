@@ -208,10 +208,8 @@ void OnFrameEnd()
     wroteCodes = true;
   }
 
-  static const u32 matchStart = 0x80400000;
-  static const u32 matchEnd = 0x80400001;
-  static const u32 grudgeMatchBool = 0x80400003;
-  // overtime is at 0x80400002 so don't use that for anything
+  static const u32 matchStart = 0x80600000;
+  static const u32 matchEnd = 0x80600001;
 
   // c2 gecko for hud (800f83bc) must be on to make this happen
   // movie cannot be playing input back since we do not want to record that
@@ -219,7 +217,7 @@ void OnFrameEnd()
   // match start
   if (Memory::Read_U8(matchStart) == 1 && !StateAuxillary::getBoolMatchStart() &&
       !Movie::IsPlayingInput() && !Movie::IsRecordingInput() && !StateAuxillary::isSpectator() &&
-      Memory::Read_U8(grudgeMatchBool) == 1 && Config::Get(Config::MAIN_REPLAYS))
+      Config::Get(Config::MAIN_REPLAYS))
   {
     boolMatchStart = true;
     StateAuxillary::setBoolMatchStart(true);
