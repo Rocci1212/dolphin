@@ -389,7 +389,6 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="CMakeLists.txt" />
-    <Text Include="createspook.bat" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="DolphinQt.rc" />

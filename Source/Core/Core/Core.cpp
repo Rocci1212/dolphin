@@ -208,14 +208,15 @@ void OnFrameEnd()
     wroteCodes = true;
   }
 
-  static const u32 matchStart = 0x80600000;
-  static const u32 matchEnd = 0x80600001;
+  static const u32 matchStatus = 0x80600000;
+  static const int matchStarted = 1;
+  static const int matchStopped = 0;
 
   // c2 gecko for hud (800f83bc) must be on to make this happen
   // movie cannot be playing input back since we do not want to record that
 
   // match start
-  if (Memory::Read_U8(matchStart) == 1 && !StateAuxillary::getBoolMatchStart() &&
+  if (Memory::Read_U8(matchStatus) == matchStarted && !StateAuxillary::getBoolMatchStart() &&
       !Movie::IsPlayingInput() && !Movie::IsRecordingInput() && !StateAuxillary::isSpectator() &&
       Config::Get(Config::MAIN_REPLAYS))
   {
@@ -231,7 +232,7 @@ void OnFrameEnd()
   }
 
   // match end
-  if (Memory::Read_U8(matchEnd) == 1 && !StateAuxillary::getBoolMatchEnd() &&
+  if (Memory::Read_U8(matchStatus) == matchStopped && !StateAuxillary::getBoolMatchEnd() &&
       !Movie::IsPlayingInput() && Movie::IsRecordingInput())
   {
     StateAuxillary::setBoolMatchEnd(true);
