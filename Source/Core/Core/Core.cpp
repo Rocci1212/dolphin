@@ -2,6 +2,9 @@
 // SPDX-License-Identifier: GPL-2.0-or-later
 
 #include "Core/Core.h"
+//#include "Core/StateAuxillary.h"
+//#include "Core/Metadata.h"
+//#include "Core/DefaultGeckoCodes.h"
 
 #include <algorithm>
 #include <atomic>
@@ -10,6 +13,8 @@
 #include <queue>
 #include <utility>
 #include <variant>
+#include <thread>
+#include <ctime>
 
 #include <fmt/chrono.h>
 #include <fmt/format.h>
@@ -71,6 +76,9 @@
 #include "Core/State.h"
 #include "Core/System.h"
 #include "Core/WiiRoot.h"
+
+#include "Core/HW/Memmap.h"
+#include "Core/Config/WiimoteSettings.h"
 
 #ifdef USE_MEMORYWATCHER
 #include "Core/MemoryWatcher.h"
