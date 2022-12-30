@@ -200,10 +200,8 @@ void OnFrameEnd()
   // we don't want to mess up past save states with current, possibly different, gecko codes
   if (!StateAuxillary::getBoolWroteCodes() && !Movie::IsPlayingInput())
   {
-    /*
     DefaultGeckoCodes codeWriter;
     codeWriter.RunCodeInject(false);
-    */
     StateAuxillary::setBoolWroteCodes(true);
     wroteCodes = true;
   }
