@@ -215,7 +215,7 @@ void OnFrameEnd()
 
   // match start
   if (Memory::Read_U8(matchStatus) == matchStarted && !StateAuxillary::getBoolMatchStart() &&
-      !Movie::IsPlayingInput() && !Movie::IsRecordingInput() && !StateAuxillary::isSpectator() &&
+      !Movie::IsPlayingInput() && !Movie::IsRecordingInput() && /* !StateAuxillary::isSpectator() && */
       Config::Get(Config::MAIN_REPLAYS))
   {
     boolMatchStart = true;
@@ -231,7 +231,7 @@ void OnFrameEnd()
 
   // match end
   if (Memory::Read_U8(matchStatus) == matchStopped && !StateAuxillary::getBoolMatchEnd() &&
-      !Movie::IsPlayingInput() && Movie::IsRecordingInput())
+      !Movie::IsPlayingInput() && Movie::IsRecordingInput()) // isRecordingInput is set to false here, not sure why
   {
     StateAuxillary::setBoolMatchEnd(true);
     boolMatchEnd = true;

@@ -16,7 +16,7 @@ namespace Common
 #else
 #define BUILD_TYPE_STR ""
 #endif
-#define SPOOKY_REV_STR "0.0.5"
+#define SPOOKY_REV_STR "0.0.6"
 
 const std::string& GetScmRevStr()
 {
