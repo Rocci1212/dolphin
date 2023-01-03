@@ -1776,5 +1776,10 @@ void Shutdown()
 {
   s_currentInputCount = s_totalInputCount = s_totalFrames = s_tickCountAtLastInput = 0;
   s_temp_input.clear();
+
+  // shutdown is called any time the game (core) is closed
+  // delete any residue from shutting down a playback early that wasn't handled from graceful movie end
+  std::thread t1(&StateAuxillary::endPlayback);
+  t1.detach();
 }
 }  // namespace Movie

@@ -140,7 +140,7 @@ bool AutoUpdateChecker::SystemSupportsAutoUpdates()
   return false;
 #endif
 }
-
+/*
 static std::string GetPlatformID()
 {
 #if defined(_WIN32)
@@ -159,32 +159,27 @@ static std::string GetPlatformID()
   return "unknown";
 #endif
 }
-
+*/
 void AutoUpdateChecker::CheckForUpdate(std::string_view update_track,
                                        std::string_view hash_override, const CheckType check_type)
 {
-  // Don't bother checking if updates are not supported or not enabled.
-  if (!SystemSupportsAutoUpdates() || update_track.empty())
-    return;
-
 #ifdef __APPLE__
   CleanupFromPreviousUpdate();
 #endif
 
-  std::string_view version_hash = hash_override.empty() ? Common::GetScmRevGitStr() : hash_override;
-  std::string url = fmt::format("https://dolphin-emu.org/update/check/v1/{}/{}/{}", update_track,
-                                version_hash, GetPlatformID());
-
-  const bool is_manual_check = check_type == CheckType::Manual;
+  // This url returns a json containing info about the latest release
+  std::string url = "https://api.github.com/repos/Rocci1212/spooky-dolphin/releases/latest";
+  Common::HttpRequest::Headers headers = {
+      {"user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like "
+                     "Gecko) Chrome/97.0.4692.71 Safari/537.36"}};
 
   Common::HttpRequest req{std::chrono::seconds{10}};
-  auto resp = req.Get(url);
+  auto resp = req.Get(url, headers);
   if (!resp)
   {
-    if (is_manual_check)
-      CriticalAlertFmtT("Unable to contact update server.");
-    return;
+    ERROR_LOG_FMT(COMMON, "Auto-update request failed");
   }
+  
   const std::string contents(reinterpret_cast<char*>(resp->data()), resp->size());
   INFO_LOG_FMT(COMMON, "Auto-update JSON response: {}", contents);
 
@@ -196,26 +191,15 @@ void AutoUpdateChecker::CheckForUpdate(std::string_view update_track,
     return;
   }
   picojson::object obj = json.get<picojson::object>();
-
-  if (obj["status"].get<std::string>() != "outdated")
+  
+  // check if latest version == current
+  if (obj["tag_name"].get<std::string>() == Common::GetSpookyRevStr())
   {
-    if (is_manual_check)
-      SuccessAlertFmtT("You are running the latest version available on this update track.");
     INFO_LOG_FMT(COMMON, "Auto-update status: we are up to date.");
     return;
   }
 
-  NewVersionInformation nvi;
-  nvi.this_manifest_url = obj["old"].get<picojson::object>()["manifest"].get<std::string>();
-  nvi.next_manifest_url = obj["new"].get<picojson::object>()["manifest"].get<std::string>();
-  nvi.content_store_url = obj["content-store"].get<std::string>();
-  nvi.new_shortrev = obj["new"].get<picojson::object>()["name"].get<std::string>();
-  nvi.new_hash = obj["new"].get<picojson::object>()["hash"].get<std::string>();
-
-  // TODO: generate the HTML changelog from the JSON information.
-  nvi.changelog_html = GenerateChangelog(obj["changelog"].get<picojson::array>());
-
-  OnUpdateAvailable(nvi);
+  OnUpdateAvailable(obj["tag_name"].get<std::string>());
 }
 
 void AutoUpdateChecker::TriggerUpdate(const AutoUpdateChecker::NewVersionInformation& info,
