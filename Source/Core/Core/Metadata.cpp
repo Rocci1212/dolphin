@@ -14,7 +14,7 @@ static int homeTeamPossesionFrameCount;
 static int awayTeamPossesionFrameCount;
 static std::string playerName = "";
 std::vector<const NetPlay::Player*> playerArray;
-static NetPlay::PadMappingArray netplayGCMap;
+static NetPlay::PadMappingArray netplayWiimoteMap;
 
 static u16 controllerPort1;
 static u16 controllerPort2;
@@ -186,9 +186,9 @@ void Metadata::setPlayerArray(std::vector<const NetPlay::Player*> playerArrayPar
   // statViewerPlayers = playerArrayParam;
 }
 
-void Metadata::setNetPlayControllers(NetPlay::PadMappingArray m_pad_map)
+void Metadata::setNetPlayControllers(NetPlay::PadMappingArray m_wiimote_map)
 {
-  netplayGCMap = m_pad_map;
+  netplayWiimoteMap = m_wiimote_map;
   // statViewerControllers = m_pad_map;
 }
 
@@ -204,5 +204,5 @@ std::vector<const NetPlay::Player*> Metadata::getPlayerArray()
 
 NetPlay::PadMappingArray Metadata::getControllers()
 {
-  return netplayGCMap;
+  return netplayWiimoteMap;
 }

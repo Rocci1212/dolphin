@@ -1730,7 +1730,7 @@ bool NetPlayClient::StartGame(const std::string& path)
   else
   {
     // rocci todo
-    StateAuxillary::setNetPlayControllers(m_pad_map, m_pid);
+    StateAuxillary::setNetPlayControllers(m_wiimote_map, m_pid);
     //Metadata::setPlayerArray(GetPlayers());
     //Metadata::setNetPlayControllers(m_pad_map);
     // StatViewer::setNetPlayControllersAndPlayers(m_pad_map, GetPlayers());
@@ -1739,6 +1739,7 @@ bool NetPlayClient::StartGame(const std::string& path)
 
   for (unsigned int i = 0; i < 4; ++i)
   {
+    // i want to force the wii remote 1 config to override all other configs - is this where i'd do it?
     Config::SetCurrent(Config::GetInfoForWiimoteSource(i),
                        m_wiimote_map[i] > 0 ? WiimoteSource::Emulated : WiimoteSource::None);
   }

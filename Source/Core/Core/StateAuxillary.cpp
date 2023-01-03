@@ -14,7 +14,7 @@ static bool boolMatchStart = false;
 static bool boolMatchEnd = false;
 static bool wroteCodes = false;
 
-static NetPlay::PadMappingArray netplayGCMap;
+static NetPlay::PadMappingArray netplayWiimoteMap;
 // even if the player is using multiple netplay ports to play, say 1 and 3, the game only needs the
 // first one to do proper playback therefore, we can use a single int instead of an array
 static int ourNetPlayPort;
@@ -75,8 +75,14 @@ void StateAuxillary::startRecording()
   {
     for (unsigned int i = 0; i < 4; ++i)
     {
-      // dumbass hack that didn't work
-      wiimotes[i] = true;
+      if (netplayWiimoteMap[i] > 0)
+      {
+        controllers[i] = Movie::ControllerType::GC;
+      }
+      else
+      {
+        controllers[i] = Movie::ControllerType::None;
+      }
     }
   }
   else
@@ -132,13 +138,13 @@ void StateAuxillary::endPlayback()
   }
 }
 
-void StateAuxillary::setNetPlayControllers(NetPlay::PadMappingArray m_pad_map,
+void StateAuxillary::setNetPlayControllers(NetPlay::PadMappingArray m_wiimote_map,
                                            NetPlay::PlayerId m_pid)
 {
-  netplayGCMap = m_pad_map;
+  netplayWiimoteMap = m_wiimote_map;
   for (int i = 0; i < 4; i++)
   {
-    if (m_pad_map[i] == m_pid)
+    if (m_wiimote_map[i] == m_pid)
     {
       ourNetPlayPortsVector.at(i) = 1;
     }
