@@ -68,18 +68,15 @@ void StateAuxillary::startRecording()
   Movie::WiimoteEnabledArray wiimotes{};
   // this is how they're set up in mainwindow.cpp
 
-  if (NetPlay::IsNetPlayRunning())
+  // right now all wii remotes are needed in order for netplay playback to work right
+  // what i need to do is overwrite all wii remotes with the Wii Remote 1 only for Netplay
+  // similar to how it works for GameCube games
+  if (false && NetPlay::IsNetPlayRunning())
   {
     for (unsigned int i = 0; i < 4; ++i)
     {
-      if (netplayGCMap[i] > 0)
-      {
-        controllers[i] = Movie::ControllerType::GC;
-      }
-      else
-      {
-        controllers[i] = Movie::ControllerType::None;
-      }
+      // dumbass hack that didn't work
+      wiimotes[i] = true;
     }
   }
   else
