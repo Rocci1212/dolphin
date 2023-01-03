@@ -75,7 +75,7 @@
 #include "UICommon/GameFile.h"
 #include "VideoCommon/OnScreenDisplay.h"
 #include "VideoCommon/VideoConfig.h"
-//#include <Core/StateAuxillary.h>
+#include <Core/StateAuxillary.h>
 //#include "Core/Metadata.h"
 
 namespace NetPlay
@@ -1730,7 +1730,7 @@ bool NetPlayClient::StartGame(const std::string& path)
   else
   {
     // rocci todo
-    //StateAuxillary::setNetPlayControllers(m_pad_map, m_pid);
+    StateAuxillary::setNetPlayControllers(m_pad_map, m_pid);
     //Metadata::setPlayerArray(GetPlayers());
     //Metadata::setNetPlayControllers(m_pad_map);
     // StatViewer::setNetPlayControllersAndPlayers(m_pad_map, GetPlayers());

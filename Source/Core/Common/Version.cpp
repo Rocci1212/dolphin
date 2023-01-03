@@ -16,7 +16,7 @@ namespace Common
 #else
 #define BUILD_TYPE_STR ""
 #endif
-#define SPOOKY_REV_STR "0.0.6"
+#define SPOOKY_REV_STR "0.0.7"
 
 const std::string& GetScmRevStr()
 {
@@ -72,11 +72,11 @@ const std::string& GetScmUpdateTrackStr()
 const std::string& GetNetplayDolphinVer()
 {
 #ifdef _WIN32
-  static const std::string netplay_dolphin_ver = SCM_DESC_STR " Win";
+  static const std::string netplay_dolphin_ver = "Spooky " SPOOKY_REV_STR " Win";
 #elif __APPLE__
-  static const std::string netplay_dolphin_ver = SCM_DESC_STR " Mac";
+  static const std::string netplay_dolphin_ver = "Spooky " SPOOKY_REV_STR " Mac";
 #else
-  static const std::string netplay_dolphin_ver = SCM_DESC_STR " Lin";
+  static const std::string netplay_dolphin_ver = "Spooky " SPOOKY_REV_STR " Lin";
 #endif
   return netplay_dolphin_ver;
 }
