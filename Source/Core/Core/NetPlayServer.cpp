@@ -2098,7 +2098,7 @@ bool NetPlayServer::PlayerHasControllerMapped(const PlayerId pid) const
 
 void NetPlayServer::AssignNewUserAPad(const Client& player)
 {
-  for (PlayerId& mapping : m_pad_map)
+  for (PlayerId& mapping : m_wiimote_map)
   {
     // 0 means unmapped
     if (mapping == 0)
