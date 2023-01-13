@@ -1541,10 +1541,6 @@ void SaveRecording(const std::string& filename)
   header.GBAControllers = 0;
   for (int i = 0; i < 4; ++i)
   {
-    if (IsUsingGBA(i))
-      header.GBAControllers |= 1 << i;
-    if (IsUsingPad(i))
-      header.controllers |= 1 << i;
     if (IsUsingWiimote(i) && SConfig::GetInstance().bWii)
       header.controllers |= 1 << (i + 4);
   }

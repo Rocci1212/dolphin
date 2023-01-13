@@ -75,14 +75,7 @@ void StateAuxillary::startRecording()
   {
     for (unsigned int i = 0; i < 4; ++i)
     {
-      if (netplayWiimoteMap[i] > 0)
-      {
-        controllers[i] = Movie::ControllerType::GC;
-      }
-      else
-      {
-        controllers[i] = Movie::ControllerType::None;
-      }
+      controllers[i] = Movie::ControllerType::None;
     }
   }
   else
