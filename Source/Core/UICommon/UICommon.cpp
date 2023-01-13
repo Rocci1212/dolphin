@@ -321,7 +321,7 @@ void SetUserDirectory(std::string custom_path)
     RegCloseKey(hkey);
   }
 
-  local = local != 0 || File::Exists(File::GetExeDirectory() + DIR_SEP "portable.txt");
+  local = local != 0 || true; //File::Exists(File::GetExeDirectory() + DIR_SEP "portable.txt"); - we're forcing this
 
   // Get Documents path in case we need it.
   // TODO: Maybe use WIL when it's available?
@@ -374,7 +374,7 @@ void SetUserDirectory(std::string custom_path)
     //
     // On Android, custom_path is set, so this code path is never reached.
     std::string exe_path = File::GetExeDirectory();
-    if (File::Exists(exe_path + DIR_SEP "portable.txt"))
+    if (true/* File::Exists(exe_path + DIR_SEP "portable.txt")*/) // we're forcing this
     {
       user_path = exe_path + DIR_SEP "User" DIR_SEP;
     }
