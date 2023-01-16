@@ -82,13 +82,7 @@ void StateAuxillary::startRecording()
   {
     for (int i = 0; i < 4; i++)
     {
-      const SerialInterface::SIDevices si_device = Config::Get(Config::GetInfoForSIDevice(i));
-      if (si_device == SerialInterface::SIDEVICE_GC_GBA_EMULATED)
-        controllers[i] = Movie::ControllerType::GBA;
-      else if (SerialInterface::SIDevice_IsGCController(si_device))
-        controllers[i] = Movie::ControllerType::GC;
-      else
-        controllers[i] = Movie::ControllerType::None;
+      controllers[i] = Movie::ControllerType::None;
       wiimotes[i] = Config::Get(Config::GetInfoForWiimoteSource(i)) != WiimoteSource::None;
     }
   }
