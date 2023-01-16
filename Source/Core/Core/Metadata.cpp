@@ -24,12 +24,12 @@ static std::vector<int> controllerVector(4);
 
 static u32 homeCaptainID;
 static u32 awayCaptainID;
-static u32 homeSidekick1;
-static u32 awaySidekick1;
-static u32 homeSidekick2;
-static u32 awaySidekick2;
-static u32 homeSidekick3;
-static u32 awaySidekick3;
+static u32 homeSidekickTopID;
+static u32 awaySidekickTopID;
+static u32 homeSidekickBackID;
+static u32 awaySidekickBackID;
+static u32 homeSidekickBottomID;
+static u32 awaySidekickBottomID;
 
 static u32 stadiumID;
 static u32 overtimeNotReached;
@@ -59,6 +59,16 @@ std::string Metadata::getJSONString()
     md5String += std::format("{:x}", md5Hash[i]);
   }
   json_stream << "  \"Game Hash\": \"" << md5String << "\"," << std::endl;
+
+  json_stream << "  \"Home Captain ID\": \"" << homeCaptainID << "\"," << std::endl;
+  json_stream << "  \"Home Top Sidekick ID\": \"" << homeSidekickTopID << "\"," << std::endl;
+  json_stream << "  \"Home Back Sidekick ID\": \"" << homeSidekickBackID << "\"," << std::endl;
+  json_stream << "  \"Home Bottom Sidekick ID\": \"" << homeSidekickBottomID << "\"," << std::endl;
+  json_stream << "  \"Away Captain ID\": \"" << awayCaptainID << "\"," << std::endl;
+  json_stream << "  \"Away Top Sidekick ID\": \"" << awaySidekickTopID << "\"," << std::endl;
+  json_stream << "  \"Away Back Sidekick ID\": \"" << awaySidekickBackID << "\"," << std::endl;
+  json_stream << "  \"Away Bottom Sidekick ID\": \"" << awaySidekickBottomID << "\"," << std::endl;
+
   json_stream << "  \"Controller Port Info\": {" << std::endl;
   for (int i = 0; i < 4; i++)
   {
@@ -172,7 +182,15 @@ void Metadata::setMatchMetadata(tm* matchDateTimeParam)
   // have consistent time across the output file and the in-json time
   matchDateTime = matchDateTimeParam;
 
-  // set controllers
+  // not working, not sure why
+  homeCaptainID = Memory::Read_U32(addressHomeCaptainID);
+  awayCaptainID = Memory::Read_U32(addressAwayCaptainID);
+  homeCaptainID = Memory::Read_U32(addressHomeSidekickTopID);
+  awayCaptainID = Memory::Read_U32(addressAwaySidekickTopID);
+  homeCaptainID = Memory::Read_U32(addressHomeSidekickBackID);
+  awayCaptainID = Memory::Read_U32(addressAwaySidekickBackID);
+  homeCaptainID = Memory::Read_U32(addressHomeSidekickBottomID);
+  awayCaptainID = Memory::Read_U32(addressAwaySidekickBottomID);
 }
 
 void Metadata::setPlayerName(std::string playerNameParam)

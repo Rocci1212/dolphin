@@ -242,19 +242,7 @@ void OnFrameEnd()
     time(&curr_time);
     curr_tm = localtime(&curr_time);
     strftime(date_string, 50, "%B_%d_%Y_%OH_%OM_%OS", curr_tm);
-    /*
-    PWSTR path;
-    SHGetKnownFolderPath(FOLDERID_Documents, KF_FLAG_DEFAULT, NULL, &path);
-    std::wstring strpath(path);
-    CoTaskMemFree(path);
-    std::string documents_file_path(strpath.begin(), strpath.end());
-    std::string replays_path = "";
-    replays_path += documents_file_path;
-    replays_path += "\\Citrus Replays";
-    // C://Users//Brian//Documents//Citrus Replays
-    std::string fileName = "\\output.dtm";
-    replays_path += fileName;
-    */
+
     std::string uiFileName = File::GetUserPath(D_SPOOKYREPLAYS_IDX) + "output.dtm";
 
     StateAuxillary::stopRecording(uiFileName, curr_tm);

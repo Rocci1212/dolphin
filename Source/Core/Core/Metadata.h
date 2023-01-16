@@ -24,11 +24,17 @@ public:
   static const u32 addressControllerPort2 = 0x81536A06;
   static const u32 addressControllerPort3 = 0x81536A08;
   static const u32 addressControllerPort4 = 0x81536A0A;
+  */
 
-  static const u32 addressLeftSideCaptainID = 0x815369f0;
-  static const u32 addressRightSideCaptainID = 0x815369f4;
-  static const u32 addressLeftSideSidekickID = 0x815369f8;
-  static const u32 addressRightSideSidekickID = 0x815369fc;
+  static const u32 addressHomeCaptainID = 0x80C663F8;
+  static const u32 addressAwayCaptainID = 0x80C663FC;
+  static const u32 addressHomeSidekickTopID = 0x80C66400;
+  static const u32 addressAwaySidekickTopID = 0x80C6640C;
+  static const u32 addressHomeSidekickBackID = 0x80C66404;
+  static const u32 addressAwaySidekickBackID = 0x80C66410;
+  static const u32 addressHomeSidekickBottomID = 0x80C66408;
+  static const u32 addressAwaySidekickBottomID = 0x80C66414;
+  /*
   static const u32 addressStadiumID = 0x81536a00;
 
   // left team
