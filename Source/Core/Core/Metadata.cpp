@@ -67,23 +67,7 @@ std::string Metadata::getJSONString()
   json_stream << "  \"Away Captain ID\": \"" << awayCaptainID << "\"," << std::endl;
   json_stream << "  \"Away Top Sidekick ID\": \"" << awaySidekickTopID << "\"," << std::endl;
   json_stream << "  \"Away Back Sidekick ID\": \"" << awaySidekickBackID << "\"," << std::endl;
-  json_stream << "  \"Away Bottom Sidekick ID\": \"" << awaySidekickBottomID << "\"," << std::endl;
-
-  json_stream << "  \"Controller Port Info\": {" << std::endl;
-  for (int i = 0; i < 4; i++)
-  {
-    if (i != 3)
-    {
-      json_stream << "    \"Controller Port " + std::to_string(i) + "\": "
-                  << std::to_string(controllerVector.at(i)) << "," << std::endl;
-    }
-    else
-    {
-      // no comma cuz end
-      json_stream << "    \"Controller Port " + std::to_string(i) + "\": "
-                  << std::to_string(controllerVector.at(i)) << std::endl;
-    }
-  }
+  json_stream << "  \"Away Bottom Sidekick ID\": \"" << awaySidekickBottomID << "\"" << std::endl;
 
   json_stream << "}" << std::endl;
 
@@ -185,12 +169,12 @@ void Metadata::setMatchMetadata(tm* matchDateTimeParam)
   // not working, not sure why
   homeCaptainID = Memory::Read_U32(addressHomeCaptainID);
   awayCaptainID = Memory::Read_U32(addressAwayCaptainID);
-  homeCaptainID = Memory::Read_U32(addressHomeSidekickTopID);
-  awayCaptainID = Memory::Read_U32(addressAwaySidekickTopID);
-  homeCaptainID = Memory::Read_U32(addressHomeSidekickBackID);
-  awayCaptainID = Memory::Read_U32(addressAwaySidekickBackID);
-  homeCaptainID = Memory::Read_U32(addressHomeSidekickBottomID);
-  awayCaptainID = Memory::Read_U32(addressAwaySidekickBottomID);
+  homeSidekickTopID = Memory::Read_U32(addressHomeSidekickTopID);
+  awaySidekickTopID = Memory::Read_U32(addressAwaySidekickTopID);
+  homeSidekickBackID = Memory::Read_U32(addressHomeSidekickBackID);
+  awaySidekickBackID = Memory::Read_U32(addressAwaySidekickBackID);
+  homeSidekickBottomID = Memory::Read_U32(addressHomeSidekickBottomID);
+  awaySidekickBottomID = Memory::Read_U32(addressAwaySidekickBottomID);
 }
 
 void Metadata::setPlayerName(std::string playerNameParam)
