@@ -4,7 +4,7 @@
 #include "Core/Core.h"
 #include "Core/StateAuxillary.h"
 //#include "Core/Metadata.h"
-#include "Core/DefaultGeckoCodes.h"
+//#include "Core/DefaultGeckoCodes.h"
 
 #include <algorithm>
 #include <atomic>
@@ -200,8 +200,8 @@ void OnFrameEnd()
   // we don't want to mess up past save states with current, possibly different, gecko codes
   if (!StateAuxillary::getBoolWroteCodes() && !Movie::IsPlayingInput())
   {
-    DefaultGeckoCodes codeWriter;
-    codeWriter.RunCodeInject(false);
+    //DefaultGeckoCodes codeWriter;
+    //codeWriter.RunCodeInject(false);
     StateAuxillary::setBoolWroteCodes(true);
     wroteCodes = true;
   }
