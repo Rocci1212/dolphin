@@ -1,0 +1,17 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <SharedGUID>14441dea-4ae0-4570-bd60-3a03e0140fb8</SharedGUID>
+  </PropertyGroup>
+  <PropertyGroup Label="Configuration">
+    <Import_RootNamespace>GeckoCodes</Import_RootNamespace>
+  </PropertyGroup>
+  <ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory)Flag On Game Quit.txt" />
+    <Content Include="$(MSBuildThisFileDirectory)Flag On Game End.txt" />
+    <Content Include="$(MSBuildThisFileDirectory)Flag On Game Restart.txt" />
+    <Content Include="$(MSBuildThisFileDirectory)Flag On Game Start.txt" />
+  </ItemGroup>
+</Project>
