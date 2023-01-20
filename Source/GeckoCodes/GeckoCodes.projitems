@@ -9,9 +9,10 @@
     <Import_RootNamespace>GeckoCodes</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="$(MSBuildThisFileDirectory)Flag On Game Quit.txt" />
-    <Content Include="$(MSBuildThisFileDirectory)Flag On Game End.txt" />
-    <Content Include="$(MSBuildThisFileDirectory)Flag On Game Restart.txt" />
-    <Content Include="$(MSBuildThisFileDirectory)Flag On Game Start.txt" />
+    <Content Include="$(MSBuildThisFileDirectory)Flag On Game Quit.asm" />
+    <Content Include="$(MSBuildThisFileDirectory)Flag On Game End.asm" />
+    <Content Include="$(MSBuildThisFileDirectory)Flag On Game Restart.asm" />
+    <Content Include="$(MSBuildThisFileDirectory)Flag On Game Start.asm" />
+    <Content Include="$(MSBuildThisFileDirectory)Flag Sidekick Possession.asm" />
   </ItemGroup>
 </Project>
