@@ -15,4 +15,8 @@
     <Content Include="$(MSBuildThisFileDirectory)Flag On Game Start.asm" />
     <Content Include="$(MSBuildThisFileDirectory)Flag Sidekick Possession.asm" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)Mark Desyncs.asm" />
+    <None Include="$(MSBuildThisFileDirectory)Shake on Desyncs.asm" />
+  </ItemGroup>
 </Project>
