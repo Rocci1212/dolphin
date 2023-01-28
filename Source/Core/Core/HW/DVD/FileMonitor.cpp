@@ -17,6 +17,7 @@
 
 #include "DiscIO/Filesystem.h"
 #include "DiscIO/Volume.h"
+#include "Core/PowerPC/PowerPC.h"
 
 namespace FileMonitor
 {
@@ -79,7 +80,7 @@ void FileLogger::Log(const DiscIO::Volume& volume, const DiscIO::Partition& part
 
   const std::string size_string = ThousandSeparate(file_info->GetSize() / 1000, 7);
   const std::string path = file_info->GetPath();
-  const std::string log_string = fmt::format("{} kB {}", size_string, path);
+  const std::string log_string = fmt::format("{:08x} {} kB {}", PC, size_string, path);
   if (IsSoundFile(path))
     INFO_LOG_FMT(FILEMON, "{}", log_string);
   else

@@ -79,6 +79,10 @@ void HLE_GeneralDebugPrint(ParameterType parameter_type)
 
   StringPopBackIf(&report_message, '\n');
 
+  std::string report_msg = SHIFTJISToUTF8(report_message);
+  if (report_msg == "WPADSetSamplingCallback()" || report_msg == "handle = 0, repid = 18")
+    return;
+
   NOTICE_LOG_FMT(OSREPORT_HLE, "{:08x}->{:08x}| {}", LR, PC, SHIFTJISToUTF8(report_message));
 }
 
