@@ -2,8 +2,9 @@
 START:
   lis r15, 0x8060
   ori r15, r15, 0x0010
-  cmpwi r15, 0
-  beq FINALLY
+  lwz r15, 0(r15)
+  cmpwi r15, 1
+  bne FINALLY
   lis r15, 0x80CF
   ori r15, r15, 0x7124
   lwz r14, 0(r15)
