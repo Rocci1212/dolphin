@@ -85,6 +85,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "FatFs", "..\Externals\FatFs
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "spng", "..\Externals\libspng\spng.vcxproj", "{447B7B1E-1D74-4AEF-B2B9-6EB41C5D5313}"
 EndProject
+Project("{D954291E-2A0B-460D-934E-DC6B0785DB48}") = "GeckoCodes", "GeckoCodes\GeckoCodes.shproj", "{14441DEA-4AE0-4570-BD60-3A03E0140FB8}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|ARM64 = Debug|ARM64
@@ -447,5 +449,8 @@ Global
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {64B0A343-3B94-4522-9C24-6937FE5EFB22}
+	EndGlobalSection
+	GlobalSection(SharedMSBuildProjectFiles) = preSolution
+		GeckoCodes\GeckoCodes.projitems*{14441dea-4ae0-4570-bd60-3a03e0140fb8}*SharedItemsImports = 13
 	EndGlobalSection
 EndGlobal
