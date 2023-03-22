@@ -198,7 +198,7 @@ void OnFrameEnd()
 
     // inject ALWAYS requried replay codes if we're not playing back a recording
   // we don't want to mess up past save states with current, possibly different, gecko codes
-  if (!StateAuxillary::getBoolWroteCodes() && !Movie::IsPlayingInput())
+  if (!StateAuxillary::getBoolWroteCodes() && !Movie::IsPlayingInput() && NetPlay::IsNetPlayRunning())
   {
     DefaultGeckoCodes codeWriter;
     codeWriter.RunCodeInject(false);
