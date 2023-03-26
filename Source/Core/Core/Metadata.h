@@ -34,6 +34,7 @@ public:
   static const u32 addressAwaySidekickBottomID = 0x80C66410;
   static const u32 addressHomeSidekickBackID = 0x80C66408;
   static const u32 addressAwaySidekickBackID = 0x80C66414;
+  static const u32 addressStadiumID = 0x80C66418;
   /*
   static const u32 addressStadiumID = 0x81536a00;
 

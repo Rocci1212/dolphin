@@ -68,6 +68,7 @@ std::string Metadata::getJSONString()
   json_stream << "  \"Away Top Sidekick ID\": \"" << awaySidekickTopID << "\"," << std::endl;
   json_stream << "  \"Away Back Sidekick ID\": \"" << awaySidekickBackID << "\"," << std::endl;
   json_stream << "  \"Away Bottom Sidekick ID\": \"" << awaySidekickBottomID << "\"" << std::endl;
+  json_stream << "  \"Stadium ID\": \"" << stadiumID << "\"" << std::endl;
 
   json_stream << "}" << std::endl;
 
@@ -175,6 +176,7 @@ void Metadata::setMatchMetadata(tm* matchDateTimeParam)
   awaySidekickBackID = Memory::Read_U32(addressAwaySidekickBackID);
   homeSidekickBottomID = Memory::Read_U32(addressHomeSidekickBottomID);
   awaySidekickBottomID = Memory::Read_U32(addressAwaySidekickBottomID);
+  stadiumID = Memory::Read_U32(addressStadiumID);
 }
 
 void Metadata::setPlayerName(std::string playerNameParam)
