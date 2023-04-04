@@ -28,6 +28,11 @@ void HLE_GeneralDebugPrint(ParameterType parameter_type);
 void HLE_LogDPrint(ParameterType parameter_type);
 void HLE_LogFPrint(ParameterType parameter_type);
 
+bool ignoreWPADsampling = true;
+bool ignoreRpcController = true;
+bool ignoreGameEvents = true;
+bool ignoreSoundEvents = true;
+
 void HLE_OSPanic()
 {
   std::string error = GetStringVA();
@@ -80,8 +85,18 @@ void HLE_GeneralDebugPrint(ParameterType parameter_type)
   StringPopBackIf(&report_message, '\n');
 
   std::string report_msg = SHIFTJISToUTF8(report_message);
-  if (report_msg == "WPADSetSamplingCallback()" || report_msg == "handle = 0, repid = 18")
+  if (ignoreWPADsampling && (report_msg == "WPADSetSamplingCallback()" || report_msg == "handle = 0, repid = 18"))
     return;
+  if (ignoreRpcController && (report_msg.starts_with("RpcController: unknown") || report_message.starts_with("Local slider value")))
+    return;
+  if (ignoreSoundEvents && (report_msg.starts_with("XSoundCueHandle::") || report_msg == "Slider name: unknown"))
+    return;
+  if (ignoreGameEvents)
+  {
+    if (report_msg.starts_with("AIBall Contact") || report_msg.starts_with("Ball Contact") ||
+        report_msg.starts_with("Ball contact") || report_msg.starts_with("PhysChar Contact"))
+        return;
+  }
 
   NOTICE_LOG_FMT(OSREPORT_HLE, "{:08x}->{:08x}| {}", LR, PC, SHIFTJISToUTF8(report_message));
 }
