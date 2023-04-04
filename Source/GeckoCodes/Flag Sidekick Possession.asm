@@ -22,8 +22,8 @@ b 0x10
 
 CAPT_BALL:
 lis r30, 0x8060
-ori r30, r30, 0x10
-stb r30, 0 (r30)
+ori r30, r30, 0x01
+stb r30, 0xf (r30)
 
 FINALLY:
 mr r30, r0
