@@ -17,6 +17,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)Mark Desyncs.asm" />
+    <None Include="$(MSBuildThisFileDirectory)No Megas.asm" />
     <None Include="$(MSBuildThisFileDirectory)Shake on Desyncs.asm" />
   </ItemGroup>
 </Project>
