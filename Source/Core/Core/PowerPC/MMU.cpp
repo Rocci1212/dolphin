@@ -22,6 +22,7 @@
 #include "Core/PowerPC/JitInterface.h"
 #include "Core/PowerPC/PowerPC.h"
 #include "Core/System.h"
+#include "Core/PowerPC/PPCSymbolDB.h"
 
 #include "VideoCommon/VideoBackendBase.h"
 
@@ -1156,8 +1157,8 @@ static void GenerateDSIException(u32 effective_address, bool write)
   // DSI exceptions are only supported in MMU mode.
   if (!Core::System::GetInstance().IsMMUMode())
   {
-    PanicAlertFmt("Invalid {} {:#010x}, PC = {:#010x}", write ? "write to" : "read from",
-                  effective_address, PC);
+    PanicAlertFmt("Invalid {} {:#010x}, Symbol = {}, PC = {:#010x}", write ? "write to" : "read from",
+                  effective_address, g_symbolDB.GetDescription(PC), PC);
     if (Core::System::GetInstance().IsPauseOnPanicMode())
     {
       CPU::Break();
