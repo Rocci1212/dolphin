@@ -12,9 +12,11 @@
     <Content Include="$(MSBuildThisFileDirectory)Flag Sidekick Possession.asm" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)AvoidOpeningExceptions.asm" />
     <None Include="$(MSBuildThisFileDirectory)FlagGameState.asm" />
     <None Include="$(MSBuildThisFileDirectory)Mark Desyncs.asm" />
     <None Include="$(MSBuildThisFileDirectory)No Megas.asm" />
     <None Include="$(MSBuildThisFileDirectory)Shake on Desyncs.asm" />
+    <None Include="$(MSBuildThisFileDirectory)SkipOpening.asm" />
   </ItemGroup>
 </Project>
