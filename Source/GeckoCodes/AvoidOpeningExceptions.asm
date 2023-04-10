@@ -283,3 +283,23 @@ FINALLY:
   mtlr r4
   li r4, 1
   blr
+
+#To be inserted at 8027a574
+IS_OPENING_PLAYING:
+  lis r3, 0x8060
+  lbz r3, 0 (r3)
+  cmpwi r3, 0x3
+  lis r3, 0x8027
+  bne IS_NOT_OPENING
+
+IS_OPENING:
+  ori r3, r3, 0xa57c
+  b 0x8
+
+IS_NOT_OPENING:
+  ori r3, r3, 0xa578
+
+FINALLY:
+  mtlr r3
+  addis r3, r4, 3
+  blr
