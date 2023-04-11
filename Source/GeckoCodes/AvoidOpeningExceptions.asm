@@ -28,6 +28,7 @@ IS_OPENING_PLAYING:
   bne IS_NOT_OPENING
 
 IS_OPENING:
+  fsubs f1, f1, f1
   ori r31, r31, 0xb530
   b 0x8
 
@@ -49,6 +50,7 @@ IS_OPENING_PLAYING:
   bne IS_NOT_OPENING
 
 IS_OPENING:
+  fsubs f1, f1, f1
   ori r3, r3, 0xb548
   b 0x8
 
@@ -90,6 +92,7 @@ IS_OPENING_PLAYING:
   bne IS_NOT_OPENING
 
 IS_OPENING:
+  fsubs f0, f0, f0
   ori r4, r4, 0xb56c
   b 0x8
 
@@ -102,7 +105,7 @@ FINALLY:
   addi r3, r3, 2680
   blr
 
-#To be inserted at 8027b57c
+#To be inserted at 8027b57c - this one is crashing
 IS_OPENING_PLAYING:
   lis r30, 0x8060
   lbz r30, 0 (r30)
@@ -111,8 +114,8 @@ IS_OPENING_PLAYING:
   bne IS_NOT_OPENING
 
 IS_OPENING:
-  ori r30, r30, 0xb5a0 # i don't know why i'm skipping to here
   li r3, 0  # i don't know why i have to do this
+  ori r30, r30, 0xb584 # i don't know why i'm skipping to here
   b 0x8
 
 IS_NOT_OPENING:
@@ -132,10 +135,11 @@ IS_OPENING_PLAYING:
   bne IS_NOT_OPENING
 
 IS_OPENING:
-  ori r4, r4, 0xb5c8
+  ori r4, r4, 0xb5ac
   b 0x8
 
 IS_NOT_OPENING:
+  lis r3, 0
   ori r4, r4, 0xb5a4
 
 FINALLY:
@@ -152,6 +156,7 @@ IS_OPENING_PLAYING:
   bne IS_NOT_OPENING
 
 IS_OPENING:
+  fsubs f0, f0, f0
   ori r3, r3, 0xb5e4
   b 0x8
 
@@ -172,11 +177,12 @@ IS_OPENING_PLAYING:
   bne IS_NOT_OPENING
 
 IS_OPENING:
-  ori r3, r3, 0xb608
+  fsubs f0, f0, f0
+  ori r3, r3, 0xb60c
   b 0x8
 
 IS_NOT_OPENING:
-  ori r3, r3, 0xb60c
+  ori r3, r3, 0xb608
 
 FINALLY:
   mtlr r3
@@ -192,7 +198,8 @@ IS_OPENING_PLAYING:
   bne IS_NOT_OPENING
 
 IS_OPENING:
-  ori r3, r3, 0xb624
+  fsubs f1, f1, f1
+  ori r3, r3, 0xb620
   b 0x8
 
 IS_NOT_OPENING:
@@ -212,6 +219,7 @@ IS_OPENING_PLAYING:
   bne IS_NOT_OPENING
 
 IS_OPENING:
+  lis r0, 0
   ori r3, r3, 0xb630
   b 0x8
 
@@ -232,6 +240,7 @@ IS_OPENING_PLAYING:
   bne IS_NOT_OPENING
 
 IS_OPENING:
+  lis r0, 0
   ori r3, r3, 0xb64c
   b 0x8
 
@@ -257,7 +266,7 @@ IS_OPENING:
   b 0x8
 
 IS_NOT_OPENING:
-  ori r4, r4, 0xb648
+  ori r4, r4, 0xb650
 
 FINALLY:
   mtlr r4
@@ -293,6 +302,7 @@ IS_OPENING_PLAYING:
   bne IS_NOT_OPENING
 
 IS_OPENING:
+  lis r3, 0
   ori r3, r3, 0xa57c
   b 0x8
 
