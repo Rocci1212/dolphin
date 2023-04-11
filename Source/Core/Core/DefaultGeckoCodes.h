@@ -37,26 +37,19 @@ private:
       {0x3860002c, 0x3dc08153, 0x39ce4c6c, 0x39e00001, 0x99eefffc, 0x39e00004, 0x91ee0000,
        0x39e0012c, 0x91ee0004, 0x39e00001, 0x99ee0008, 0x39e00000, 0x99ee0009, 0x99ee000a}};
        */
-  const DefaultGeckoCode replayStart = {
-      0x8011982C, 0, {0x39C00001, 0x3DE08060, 0x91CFFFFD, 0x3DC00000, 0x3DE00000, 0x80840080,
-                      0x60000000}};
-
-                      
-  const DefaultGeckoCode replayStart2 = {
-      0x801EE6D0, 0, {0x39C00001, 0x3DE08060, 0x91CFFFFD, 0x3DC00000, 0x3DE00000, 0x806DDB78,
-                      0x60000000}};
-
-  const DefaultGeckoCode replayEnd = {
-      0x801ED380, 0, {0x39C00000, 0x3DE08060, 0x91CFFFFD, 0x3DC00000, 0x3DE00000, 0x9421FE10,
-                      0x60000000}};
+  const DefaultGeckoCode replayToggle = {
+      0x802849A4, 0, {0x3F808060, 0x2C060009, 0x40A20010, 0x38800004, 0x989C0000, 0x4800003C, 
+                      0x2C060012, 0x40A20010, 0x38800000, 0x989C0000, 0x48000028, 0x2C060004, 
+                      0x40A20020, 0x8B9C0000, 0x7C06E000, 0x40A20014, 0x3F808060, 0x38800001, 
+                      0x989C0000, 0x4082FFCC, 0x7C7D3214}};
 
   const DefaultGeckoCode replayQuit = {
-      0x802B57C4, 0, {0x39C00000, 0x3DE08060, 0x91CFFFFD, 0x3DC00000, 0x3DE00000, 0x90A30000,
+      0x802B57C4, 0, {0x39C00000, 0x3DE08060, 0x99CF0000, 0x3DC00000, 0x3DE00000, 0x90A30000, 
                       0x60000000}};
 
   void WriteAsm(DefaultGeckoCode CodeBlock);
   u32 aWriteAddr;  // address where the first code gets written to
 
   std::vector<DefaultGeckoCode> sRequiredCodes = {
-      replayStart, replayStart2, replayEnd, replayQuit};
+      replayToggle, replayQuit};
 };
