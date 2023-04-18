@@ -1,5 +1,6 @@
+#To be inserted at 800081EC
 loc_0x0:
-  stfs f0, 12(r31)
+  stfs f0, 0xc (r31)
   lis r11, 0x909B
   ori r11, r11, 0x6560
   cmpw r31, r11
