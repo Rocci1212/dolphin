@@ -47,9 +47,14 @@ private:
       0x802B57C4, 0, {0x39C00000, 0x3DE08060, 0x99CF0000, 0x3DC00000, 0x3DE00000, 0x90A30000, 
                       0x60000000}};
 
+  const DefaultGeckoCode fastStadia = {
+    0x800081F0, 0, {0x3C00909B, 0x60006530, 0x7C00F800, 0x40820030, 0x3C003F26, 0x60006666, 
+                      0x901F003C, 0x3C000000, 0x901F002C, 0x3C003E4C, 0x6000CCCD, 0x901F001C, 
+                      0x3C003F19, 0x6000999A, 0x901F000C, 0x83E1000C, 0x60000000}};
+
   void WriteAsm(DefaultGeckoCode CodeBlock);
   u32 aWriteAddr;  // address where the first code gets written to
 
   std::vector<DefaultGeckoCode> sRequiredCodes = {
-      replayToggle, replayQuit};
+      replayToggle, replayQuit, fastStadia};
 };
