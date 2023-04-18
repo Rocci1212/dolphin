@@ -39,3 +39,7 @@ CMakeLists.txt.user
 /.idea/
 # Ignore Visual Studio Code's working dir
 /.vscode/
+/Source/FormatCodeForCpp/obj
+/Source/FormatGeckoCodeForCpp/bin/Release/net7.0-windows
+/Source/FormatGeckoCodeForCpp/obj/Release/net7.0-windows
+/Source/FormatGeckoCodeForCpp/obj

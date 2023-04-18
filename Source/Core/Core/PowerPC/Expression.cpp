@@ -289,8 +289,10 @@ void Expression::Reporting(const double result) const
     Core::DisplayMessage("Breakpoint condition has encountered a NaN.", 2000);
   }
 
+  /*
   if (result != 0.0 || is_nan)
     NOTICE_LOG_FMT(MEMMAP, "Breakpoint condition returned: {}. Vars:{}", result, message);
+    */
 }
 
 std::string Expression::GetText() const
