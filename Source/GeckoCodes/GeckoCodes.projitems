@@ -12,6 +12,7 @@
     <Content Include="$(MSBuildThisFileDirectory)Flag Sidekick Possession.asm" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)All Fast Stadiums.asm" />
     <None Include="$(MSBuildThisFileDirectory)Flag On Game Quit.asm" />
     <None Include="$(MSBuildThisFileDirectory)FlagGameState.asm" />
     <None Include="$(MSBuildThisFileDirectory)Mark Desyncs.asm" />
