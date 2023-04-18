@@ -16,7 +16,9 @@ namespace Common
 #else
 #define BUILD_TYPE_STR ""
 #endif
-#define SPOOKY_REV_STR "0.1.4"
+#define SPOOKY_REV_STR "0.2.0" // this needs to be in X.X.X format or you're gonna have a bad time.
+                               // theoretically, the first two digits need to match up, otherwise
+                               // the netplay players will get a version mismatch error.
 
 const std::string& GetScmRevStr()
 {

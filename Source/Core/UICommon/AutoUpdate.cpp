@@ -191,12 +191,49 @@ void AutoUpdateChecker::CheckForUpdate(std::string_view update_track,
     return;
   }
   picojson::object obj = json.get<picojson::object>();
-  
+
+  std::string local_version_num[3] = {"", "", ""};
+  std::string github_version_num[3] = {"", "", ""};
+
+  std::istringstream f(Common::GetSpookyRevStr());
+  std::string s;
+
+  int i = 0;
+  while (std::getline(f, s, '.'))
+  {
+    local_version_num[i] = s;
+    i++;
+  }
+
+  i = 0;
+  std::istringstream g(obj["tag_name"].get<std::string>());
+  while (std::getline(g, s, '.'))
+  {
+    github_version_num[i] = s;
+    i++;
+  }
+
   // check if latest version == current
-  if (obj["tag_name"].get<std::string>() == Common::GetSpookyRevStr())
+  if (local_version_num[0] > github_version_num[0])
   {
     INFO_LOG_FMT(COMMON, "Auto-update status: we are up to date.");
     return;
+  }
+  else if (local_version_num[0] == github_version_num[0])
+  {
+    if (local_version_num[1] > github_version_num[1])
+    {
+      INFO_LOG_FMT(COMMON, "Auto-update status: we are up to date.");
+      return;
+    }
+    else if (local_version_num[1] == github_version_num[1])
+    {
+      if (local_version_num[2] >= github_version_num[2])
+      {
+        INFO_LOG_FMT(COMMON, "Auto-update status: we are up to date.");
+        return;
+      }
+    }
   }
 
   OnUpdateAvailable(obj["tag_name"].get<std::string>());
