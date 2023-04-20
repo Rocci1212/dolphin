@@ -19,5 +19,7 @@
     <None Include="$(MSBuildThisFileDirectory)No Megas.asm" />
     <None Include="$(MSBuildThisFileDirectory)Shake on Desyncs.asm" />
     <None Include="$(MSBuildThisFileDirectory)SkipOpening.asm" />
+    <None Include="$(MSBuildThisFileDirectory)Unlock All Challenges for Cheats.asm" />
+    <None Include="$(MSBuildThisFileDirectory)Unlock All Stadiums and Captains.asm" />
   </ItemGroup>
 </Project>
