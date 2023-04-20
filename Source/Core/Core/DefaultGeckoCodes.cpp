@@ -16,7 +16,7 @@ void DefaultGeckoCodes::RunCodeInject(bool bCompatibilityMode)
   for (DefaultGeckoCode geckocode : sRequiredCodes)
     WriteAsm(geckocode);
 
-  if (bCompatibilityMode)
+  if (!bCompatibilityMode)
   {
     for (DefaultGeckoCode geckocode : sTournamentCodes)
       WriteAsm(geckocode);

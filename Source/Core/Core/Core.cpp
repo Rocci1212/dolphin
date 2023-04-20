@@ -198,10 +198,14 @@ void OnFrameEnd()
 
     // inject ALWAYS requried replay codes if we're not playing back a recording
   // we don't want to mess up past save states with current, possibly different, gecko codes
-  if (!StateAuxillary::getBoolWroteCodes() && !Movie::IsPlayingInput() && NetPlay::IsNetPlayRunning())
+  if (!StateAuxillary::getBoolWroteCodes() && !Movie::IsPlayingInput())
   {
+    bool compatibilityMode = Config::Get(Config::MAIN_COMPATIBILITY_MODE);
+    if (NetPlay::IsNetPlayRunning())
+      compatibilityMode = false;
+
     DefaultGeckoCodes codeWriter;
-    codeWriter.RunCodeInject(Config::Get(Config::MAIN_COMPATIBILITY_MODE));
+    codeWriter.RunCodeInject(compatibilityMode);
     StateAuxillary::setBoolWroteCodes(true);
     wroteCodes = true;
   }
