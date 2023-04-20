@@ -201,7 +201,7 @@ void OnFrameEnd()
   if (!StateAuxillary::getBoolWroteCodes() && !Movie::IsPlayingInput() && NetPlay::IsNetPlayRunning())
   {
     DefaultGeckoCodes codeWriter;
-    codeWriter.RunCodeInject(false);
+    codeWriter.RunCodeInject(Config::Get(Config::MAIN_COMPATIBILITY_MODE));
     StateAuxillary::setBoolWroteCodes(true);
     wroteCodes = true;
   }

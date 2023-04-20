@@ -56,5 +56,10 @@ private:
   u32 aWriteAddr;  // address where the first code gets written to
 
   std::vector<DefaultGeckoCode> sRequiredCodes = {
-      replayToggle, replayQuit, fastStadia};
+    
+  };
+
+  std::vector<DefaultGeckoCode> sTournamentCodes = {
+    replayToggle, replayQuit, fastStadia
+  }
 };

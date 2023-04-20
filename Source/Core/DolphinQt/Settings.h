@@ -161,6 +161,10 @@ public:
   bool IsAnalyticsEnabled() const;
   void SetAnalyticsEnabled(bool enabled);
 
+  // Compatibility Mode
+  bool IsCompatibilityModeEnabled() const;
+  void SetCompatibilityModeEnabled(bool enabled);
+
 signals:
   void ConfigChanged();
   void EmulationStateChanged(Core::State new_state);

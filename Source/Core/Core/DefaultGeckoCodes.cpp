@@ -4,7 +4,7 @@
 // Their implementation of it comes from Project Rio, whom's website and source code can be found
 // below at: https://www.projectrio.online/ https://github.com/ProjectRio/ProjectRio
 
-void DefaultGeckoCodes::RunCodeInject(bool bIsRanked)
+void DefaultGeckoCodes::RunCodeInject(bool bCompatibilityMode)
 {
   // skip from load mem card scene to main menu
   // Memory::Write_U32(0x2c1f0023, 0x80095914);
@@ -16,8 +16,13 @@ void DefaultGeckoCodes::RunCodeInject(bool bIsRanked)
   for (DefaultGeckoCode geckocode : sRequiredCodes)
     WriteAsm(geckocode);
 
-  if (bIsRanked)
-    AddRankedCodes();
+  if (bCompatibilityMode)
+  {
+    for (DefaultGeckoCode geckocode : sTournamentCodes)
+      WriteAsm(geckocode);
+  }
+
+  AddRankedCodes();
 }
 
 void DefaultGeckoCodes::InjectNetplayEventCode()

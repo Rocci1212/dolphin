@@ -15,6 +15,8 @@
 #include "DolphinQt/Resources.h"
 #include "DolphinQt/Settings.h"
 
+#include "qpushbutton.h"
+
 static QSize ICON_SIZE(32, 32);
 
 ToolBar::ToolBar(QWidget* parent) : QToolBar(parent)

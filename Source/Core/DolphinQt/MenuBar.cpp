@@ -311,6 +311,12 @@ void MenuBar::AddEmulationMenu()
   m_fullscreen_action = emu_menu->addAction(tr("Toggle &Fullscreen"), this, &MenuBar::Fullscreen);
   m_frame_advance_action = emu_menu->addAction(tr("&Frame Advance"), this, &MenuBar::FrameAdvance);
 
+  QAction* compatibility_mode = emu_menu->addAction(tr("&Compatibility Mode"));
+  compatibility_mode->setCheckable(true);
+  compatibility_mode->setChecked(Settings::Instance().IsCompatibilityModeEnabled());
+
+  connect(compatibility_mode, &QAction::toggled, &Settings::Instance(), &Settings::SetCompatibilityModeEnabled);
+
   m_screenshot_action = emu_menu->addAction(tr("Take Screenshot"), this, &MenuBar::Screenshot);
 
   emu_menu->addSeparator();

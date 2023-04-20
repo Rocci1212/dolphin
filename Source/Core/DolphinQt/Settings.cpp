@@ -662,6 +662,19 @@ bool Settings::IsAnalyticsEnabled() const
   return Config::Get(Config::MAIN_ANALYTICS_ENABLED);
 }
 
+void Settings::SetCompatibilityModeEnabled(bool enabled)
+{
+  if (enabled == IsCompatibilityModeEnabled())
+    return;
+
+  Config::SetBase(Config::MAIN_COMPATIBILITY_MODE, enabled);
+}
+
+bool Settings::IsCompatibilityModeEnabled() const
+{
+  return Config::Get(Config::MAIN_COMPATIBILITY_MODE);
+}
+
 void Settings::SetToolBarVisible(bool visible)
 {
   if (IsToolBarVisible() == visible)
