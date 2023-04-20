@@ -42,6 +42,12 @@ private:
       0x803332D8, 0, {0x7C030040, 0x3C608060, 0x4182000C, 0x3B200001, 0x48000008, 0x3B200000, 
                       0x93230010, 0x3B200001, 0x807A011C, 0x7C031800, 0x60000000}};
 
+  const DefaultGeckoCode unlockIngameCheats = {
+      0x8010F63C, 0, {0x3C600000, 0x6063FFFF, 0x907F0068}};
+
+  const DefaultGeckoCode unlockCaptainsAndStadia = {
+      0x8010F71C, 0, {0x3C000000, 0x6000FFFF, 0xB00386AC}};
+
   const DefaultGeckoCode matchStatusToggle = {
       0x802849A4, 0, {0x3F808060, 0x2C060009, 0x40A20010, 0x38800004, 0x989C0000, 0x4800003C, 
                       0x2C060012, 0x40A20010, 0x38800000, 0x989C0000, 0x48000028, 0x2C060004, 
@@ -61,7 +67,7 @@ private:
   u32 aWriteAddr;  // address where the first code gets written to
 
   std::vector<DefaultGeckoCode> sRequiredCodes = {
-    markAndIgnoreDesyncs
+    markAndIgnoreDesyncs, unlockIngameCheats, unlockCaptainsAndStadia
   };
 
   std::vector<DefaultGeckoCode> sTournamentCodes = {
