@@ -22,6 +22,14 @@ void DefaultGeckoCodes::RunCodeInject(bool bCompatibilityMode)
       WriteAsm(geckocode);
   }
 
+  PowerPC::HostWrite_U32(0x1, aCompRules_1); // set series length to 1 
+  PowerPC::HostWrite_U32(0x1, aCompRules_2); // set game type to First to X
+  PowerPC::HostWrite_U32(0x1, aCompRules_3); // set environment cheats to Secure Stadia
+  PowerPC::HostWrite_U32(0x0, aCompRules_4); // set power up cheats to None
+  PowerPC::HostWrite_U32(0x0, aCompRules_5); // set player cheats to None
+  PowerPC::HostWrite_U32(0x0, aCompRules_6); // set camera zoom type to Static
+  PowerPC::HostWrite_U32(0x0, aCompRules_7); // set camera zoom level to 1 (greatest Field of View)
+
   AddRankedCodes();
 }
 

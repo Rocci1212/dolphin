@@ -63,6 +63,15 @@ private:
                       0x901F003C, 0x3C000000, 0x901F002C, 0x3C003E4C, 0x6000CCCD, 0x901F001C, 
                       0x3C003F19, 0x6000999A, 0x901F000C, 0x83E1000C, 0x60000000}};
 
+  static const u32 aCompRules_1 = 0x80c5f2f0;  
+  static const u32 aCompRules_2 = 0x80c5f2e4;  
+  static const u32 aCompRules_3 = 0x80c5f300;  
+  static const u32 aCompRules_4 = 0x80c5f2fc;  
+  static const u32 aCompRules_5 = 0x80c5f304;  
+  static const u32 aCompRules_6 = 0x80c5f2dc;  
+  static const u32 aCompRules_7 = 0x80c5f2d8;   
+
+
   void WriteAsm(DefaultGeckoCode CodeBlock);
   u32 aWriteAddr;  // address where the first code gets written to
 
