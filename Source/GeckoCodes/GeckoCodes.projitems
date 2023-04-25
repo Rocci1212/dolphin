@@ -17,7 +17,6 @@
     <None Include="$(MSBuildThisFileDirectory)FlagGameState.asm" />
     <None Include="$(MSBuildThisFileDirectory)Mark Desyncs.asm" />
     <None Include="$(MSBuildThisFileDirectory)No Megas.asm" />
-    <None Include="$(MSBuildThisFileDirectory)R4QP01_code.map" />
     <None Include="$(MSBuildThisFileDirectory)SkipOpening.asm" />
     <None Include="$(MSBuildThisFileDirectory)Unlock All Challenges for Cheats.asm" />
     <None Include="$(MSBuildThisFileDirectory)Unlock All Stadiums and Captains.asm" />
