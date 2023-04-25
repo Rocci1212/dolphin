@@ -12,7 +12,6 @@ void DefaultGeckoCodes::RunCodeInject(bool bCompatibilityMode, bool bNetplayMode
 
   aWriteAddr = 0x80650000;  // starting asm write addr (just a lot of blank space)
 
-  /*
   // handle asm writes for required C2 codes
   for (DefaultGeckoCode geckocode : sRequiredCodes)
     WriteAsm(geckocode);
@@ -28,6 +27,7 @@ void DefaultGeckoCodes::RunCodeInject(bool bCompatibilityMode, bool bNetplayMode
     for (DefaultGeckoCode geckocode : sNetplayCodes)
       WriteAsm(geckocode);
   }
+  /*
   PowerPC::HostWrite_U32(0x1, aCompRules_1); // set series length to 1 
   PowerPC::HostWrite_U32(0x1, aCompRules_2); // set game type to First to X
   PowerPC::HostWrite_U32(0x1, aCompRules_3); // set environment cheats to Secure Stadia
