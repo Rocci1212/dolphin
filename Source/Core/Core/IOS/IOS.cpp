@@ -623,8 +623,8 @@ std::shared_ptr<Device> EmulationKernel::GetDeviceByName(std::string_view device
 std::optional<IPCReply> Kernel::OpenDevice(OpenRequest& request)
 {
   const s32 new_fd = GetFreeDeviceID();
-  INFO_LOG_FMT(IOS, "Opening {} (mode {}, fd {})", request.path, static_cast<u32>(request.flags),
-               new_fd);
+  INFO_LOG_FMT(IOS, "{:08x}->{:08x} Opening {} (mode {}, fd {})", LR, PC,
+               request.path, static_cast<u32>(request.flags), new_fd);
   if (new_fd < 0 || new_fd >= IPC_MAX_FDS)
   {
     ERROR_LOG_FMT(IOS, "Couldn't get a free fd, too many open files");
