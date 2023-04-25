@@ -10,7 +10,7 @@ void DefaultGeckoCodes::RunCodeInject(bool bCompatibilityMode, bool bNetplayMode
   // Memory::Write_U32(0x2c1f0023, 0x80095914);
   // Memory::Write_U32(0x3be00003, 0x8009591c);
 
-  aWriteAddr = 0x80600050;  // starting asm write addr (just a lot of blank space)
+  aWriteAddr = 0x80603000;  // starting asm write addr (just a lot of blank space)
 
   // handle asm writes for required C2 codes
   for (DefaultGeckoCode geckocode : sRequiredCodes)
