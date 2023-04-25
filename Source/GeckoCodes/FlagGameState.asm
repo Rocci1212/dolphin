@@ -1,7 +1,7 @@
 #To be inserted at 802849a4
 # Flag Game Status
 GAME_BEGIN:
-  lis r28, 0x8060  		   # Load 0x80600000 into r28
+  lis r28, 0x8060  		  # Load 0x80600000 into r28
   cmpwi cr2, r6, 0x9    # Check if GameBegin is being called
   bne+ cr2, GAME_END    # If not, go to next check
   li r4, 0x4            # Load 4 into r4
