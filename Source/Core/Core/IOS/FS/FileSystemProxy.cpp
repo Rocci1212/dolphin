@@ -17,6 +17,8 @@
 #include "Core/IOS/FS/FileSystem.h"
 #include "Core/IOS/Uids.h"
 
+#include "Core/PowerPC/PowerPC.h"
+
 namespace IOS::HLE
 {
 using namespace IOS::HLE::FS;
@@ -108,8 +110,8 @@ static void LogResult(ResultCode code, fmt::format_string<Args...> format, Args&
   const auto type =
       code == ResultCode::Success ? Common::Log::LogLevel::LINFO : Common::Log::LogLevel::LERROR;
 
-  GENERIC_LOG_FMT(Common::Log::LogType::IOS_FS, type, "Command: {}: Result {}", command,
-                  static_cast<s32>(ConvertResult(code)));
+  GENERIC_LOG_FMT(Common::Log::LogType::IOS_FS, type, "{:08x}->{:08x} Command: {}: Result {}",
+                  LR, PC, command, static_cast<s32>(ConvertResult(code)));
 }
 
 template <typename T, typename... Args>
