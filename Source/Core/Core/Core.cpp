@@ -201,11 +201,13 @@ void OnFrameEnd()
   if (!StateAuxillary::getBoolWroteCodes() && !Movie::IsPlayingInput())
   {
     bool compatibilityMode = Config::Get(Config::MAIN_COMPATIBILITY_MODE);
-    if (NetPlay::IsNetPlayRunning())
+    bool netplayMode = NetPlay::IsNetPlayRunning();
+
+    if (netplayMode)
       compatibilityMode = false;
 
     DefaultGeckoCodes codeWriter;
-    codeWriter.RunCodeInject(compatibilityMode);
+    codeWriter.RunCodeInject(compatibilityMode, netplayMode);
     StateAuxillary::setBoolWroteCodes(true);
     wroteCodes = true;
   }

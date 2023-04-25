@@ -16,7 +16,7 @@
 class DefaultGeckoCodes
 {
 public:
-  void RunCodeInject(bool bIsRanked);
+  void RunCodeInject(bool bCompatibilityMode, bool bNetplayMode);
 
 private:
   void InjectNetplayEventCode();
@@ -63,6 +63,11 @@ private:
                       0x901F003C, 0x3C000000, 0x901F002C, 0x3C003E4C, 0x6000CCCD, 0x901F001C, 
                       0x3C003F19, 0x6000999A, 0x901F000C, 0x83E1000C, 0x60000000}};
 
+  const DefaultGeckoCode defaultOptions = {
+    0x802337C8, 0, {0xBF61000C, 0x3F800000, 0x3F6080C5, 0x637BF2D8, 0x939B0000, 0x939B0004, 
+                      0x939B0024, 0x939B002C, 0x3B800001, 0x939B000C, 0x939B0018, 0x939B0028, 
+                      0x60000000}};
+
   static const u32 aCompRules_1 = 0x80c5f2f0;  
   static const u32 aCompRules_2 = 0x80c5f2e4;  
   static const u32 aCompRules_3 = 0x80c5f300;  
@@ -76,10 +81,15 @@ private:
   u32 aWriteAddr;  // address where the first code gets written to
 
   std::vector<DefaultGeckoCode> sRequiredCodes = {
-    markAndIgnoreDesyncs, unlockIngameCheats, unlockCaptainsAndStadia
+    markAndIgnoreDesyncs, unlockIngameCheats, unlockCaptainsAndStadia//, defaultOptions - requires furthertesting
   };
 
   std::vector<DefaultGeckoCode> sTournamentCodes = {
-    matchStatusToggle, matchStatusToggleOnQuit, fastStadia
+    fastStadia
+  };
+
+  // match status is crashing on wiimmfi, don't know why
+  std::vector<DefaultGeckoCode> sNetplayCodes = {
+    matchStatusToggle, matchStatusToggleOnQuit
   };
 };

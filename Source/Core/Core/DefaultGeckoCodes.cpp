@@ -4,7 +4,7 @@
 // Their implementation of it comes from Project Rio, whom's website and source code can be found
 // below at: https://www.projectrio.online/ https://github.com/ProjectRio/ProjectRio
 
-void DefaultGeckoCodes::RunCodeInject(bool bCompatibilityMode)
+void DefaultGeckoCodes::RunCodeInject(bool bCompatibilityMode, bool bNetplayMode)
 {
   // skip from load mem card scene to main menu
   // Memory::Write_U32(0x2c1f0023, 0x80095914);
@@ -22,6 +22,12 @@ void DefaultGeckoCodes::RunCodeInject(bool bCompatibilityMode)
       WriteAsm(geckocode);
   }
 
+  if (bNetplayMode)
+  {
+    for (DefaultGeckoCode geckocode : sNetplayCodes)
+      WriteAsm(geckocode);
+  }
+  /*
   PowerPC::HostWrite_U32(0x1, aCompRules_1); // set series length to 1 
   PowerPC::HostWrite_U32(0x1, aCompRules_2); // set game type to First to X
   PowerPC::HostWrite_U32(0x1, aCompRules_3); // set environment cheats to Secure Stadia
@@ -29,7 +35,7 @@ void DefaultGeckoCodes::RunCodeInject(bool bCompatibilityMode)
   PowerPC::HostWrite_U32(0x0, aCompRules_5); // set player cheats to None
   PowerPC::HostWrite_U32(0x0, aCompRules_6); // set camera zoom type to Static
   PowerPC::HostWrite_U32(0x0, aCompRules_7); // set camera zoom level to 1 (greatest Field of View)
-
+  */
   AddRankedCodes();
 }
 
