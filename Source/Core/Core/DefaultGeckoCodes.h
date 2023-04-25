@@ -81,7 +81,8 @@ private:
   u32 aWriteAddr;  // address where the first code gets written to
 
   std::vector<DefaultGeckoCode> sRequiredCodes = {
-    matchStatusToggle, markAndIgnoreDesyncs, unlockIngameCheats, unlockCaptainsAndStadia//, defaultOptions - requires furthertesting
+      matchStatusToggle /*, markAndIgnoreDesyncs, unlockIngameCheats,
+      unlockCaptainsAndStadia*/  //, defaultOptions - requires furthertesting
   };
 
   std::vector<DefaultGeckoCode> sTournamentCodes = {
