@@ -82,7 +82,7 @@ private:
 
   std::vector<DefaultGeckoCode> sRequiredCodes = {
       matchStatusToggle, markAndIgnoreDesyncs, unlockIngameCheats,
-      unlockCaptainsAndStadia*/  //, defaultOptions - requires furthertesting
+      unlockCaptainsAndStadia  //, defaultOptions - requires furthertesting
   };
 
   std::vector<DefaultGeckoCode> sTournamentCodes = {

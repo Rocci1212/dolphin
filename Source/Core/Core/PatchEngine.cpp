@@ -30,6 +30,13 @@
 #include "Core/PowerPC/MMU.h"
 #include "Core/PowerPC/PowerPC.h"
 
+#include "Movie.h"
+#include "StateAuxillary.h"
+#include "DefaultGeckoCodes.h"
+
+#include "Core/NetPlayClient.h"
+#include "Core/NetPlayProto.h"
+
 namespace PatchEngine
 {
 constexpr std::array<const char*, 3> s_patch_type_strings{{

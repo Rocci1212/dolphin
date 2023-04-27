@@ -196,22 +196,6 @@ void OnFrameEnd()
     s_memory_watcher->Step();
 #endif
 
-    // inject ALWAYS requried replay codes if we're not playing back a recording
-  // we don't want to mess up past save states with current, possibly different, gecko codes
-  if (!StateAuxillary::getBoolWroteCodes() && !Movie::IsPlayingInput())
-  {
-    bool compatibilityMode = Config::Get(Config::MAIN_COMPATIBILITY_MODE);
-    bool netplayMode = NetPlay::IsNetPlayRunning();
-
-    if (netplayMode)
-      compatibilityMode = false;
-
-    DefaultGeckoCodes codeWriter;
-    codeWriter.RunCodeInject(compatibilityMode, netplayMode);
-    StateAuxillary::setBoolWroteCodes(true);
-    wroteCodes = true;
-  }
-
   static const u32 matchStatus = 0x80600000;
   static const int matchStarted = 1;
   static const int matchStopped = 0;

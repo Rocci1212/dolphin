@@ -205,6 +205,8 @@ std::vector<GeckoCode> LoadCodes(const IniFile& globalIni, const IniFile& localI
     }
   }
 
+  // rocci todo manually add codes here
+
   return gcodes;
 }
 

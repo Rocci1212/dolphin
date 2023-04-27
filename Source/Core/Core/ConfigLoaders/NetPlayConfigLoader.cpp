@@ -146,8 +146,8 @@ public:
     }
 #endif
 
-    // Check To Override Client's Cheat Codes
-    if (m_settings.sync_codes && !m_settings.is_hosting)
+    // Always sync gecko codes to avoid desyncs
+    if (!m_settings.is_hosting)
     {
       // Raise flag to use host's codes
       layer->Set(Config::SESSION_CODE_SYNC_OVERRIDE, true);
