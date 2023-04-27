@@ -40,6 +40,5 @@ CMakeLists.txt.user
 # Ignore Visual Studio Code's working dir
 /.vscode/
 /Source/FormatCodeForCpp/obj
-/Source/FormatGeckoCodeForCpp/bin/Release/net7.0-windows
-/Source/FormatGeckoCodeForCpp/obj
-/Source/FormatGeckoCodeForCpp/bin/Debug/net7.0-windows
+/Source/FormatGeckoCodeForCpp/bin/*
+/Source/FormatGeckoCodeForCpp/obj/*
