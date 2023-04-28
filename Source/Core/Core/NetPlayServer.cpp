@@ -1954,6 +1954,10 @@ bool NetPlayServer::SyncCodes()
   for (const std::string& filename : ConfigLoaders::GetGameIniFilenames(game_id, revision))
     localIni.Load(File::GetUserPath(D_GAMESETTINGS_IDX) + filename, true);
 
+  std::string exe_path = File::GetExeDirectory();
+  IniFile spooky_ini;
+  spooky_ini.Load(exe_path + "/sys/spooky.ini");
+
   // Initialize Number of Synced Players
   m_codes_synced_players = 0;
 
@@ -1968,7 +1972,7 @@ bool NetPlayServer::SyncCodes()
   {
     // Create a Gecko Code Vector with just the active codes
     std::vector<Gecko::GeckoCode> s_active_codes =
-        Gecko::SetAndReturnActiveCodes(Gecko::LoadCodes(globalIni, localIni));
+        Gecko::SetAndReturnActiveCodes(Gecko::LoadCodes(spooky_ini, globalIni, localIni));
 
     // Determine Codelist Size
     u16 codelines = 0;
