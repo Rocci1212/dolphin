@@ -47,12 +47,12 @@ GeckoCodeWidget::GeckoCodeWidget(std::string game_id, std::string gametdb_id, u1
     game_ini_local.Load(File::GetUserPath(D_GAMESETTINGS_IDX) + m_game_id + ".ini");
 
     const IniFile game_ini_default = SConfig::LoadDefaultGameIni(m_game_id, m_game_revision);
-
+    /*
     std::string exe_path = File::GetExeDirectory();
     IniFile spooky_ini;
     spooky_ini.Load(exe_path + "/sys/spooky.ini");
-
-    m_gecko_codes = Gecko::LoadCodes(spooky_ini, game_ini_default, game_ini_local);
+    */
+    m_gecko_codes = Gecko::LoadCodes(game_ini_default, game_ini_local);
   }
 
   UpdateList();

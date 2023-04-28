@@ -208,10 +208,11 @@ void LoadPatches()
   IniFile globalIni = SConfig::GetInstance().LoadDefaultGameIni();
   IniFile localIni = SConfig::GetInstance().LoadLocalGameIni();
 
+  /*
   std::string exe_path = File::GetExeDirectory();
   IniFile spookyIni;
   spookyIni.Load(exe_path + "/sys/spooky.ini");
-
+  */
   LoadPatchSection("OnFrame", &s_on_frame, globalIni, localIni);
 
   // Check if I'm syncing Codes
@@ -222,7 +223,7 @@ void LoadPatches()
   }
   else
   {
-    Gecko::SetActiveCodes(Gecko::LoadCodes(spookyIni, globalIni, localIni));
+    Gecko::SetActiveCodes(Gecko::LoadCodes(globalIni, localIni));
     ActionReplay::LoadAndApplyCodes(globalIni, localIni);
   }
 

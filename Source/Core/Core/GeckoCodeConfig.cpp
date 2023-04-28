@@ -127,11 +127,11 @@ std::vector<GeckoCode> DownloadCodes(std::string gametdb_id, bool* succeeded, bo
   return gcodes;
 }
 
-std::vector<GeckoCode> LoadCodes(const IniFile& spookyIni, const IniFile& globalIni, const IniFile& localIni)
+std::vector<GeckoCode> LoadCodes(const IniFile& globalIni, const IniFile& localIni)
 {
   std::vector<GeckoCode> gcodes;
 
-  for (const IniFile* ini : {&spookyIni, &globalIni, &localIni})
+  for (const IniFile* ini : {&globalIni, &localIni})
   {
     std::vector<std::string> lines;
     ini->GetLines("Gecko", &lines, false);
