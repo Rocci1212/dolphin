@@ -19,6 +19,7 @@
     <None Include="$(MSBuildThisFileDirectory)Blue Peach - Fix Stadium Banners.asm" />
     <None Include="$(MSBuildThisFileDirectory)Blue Peach - Fix Stadium Crowd.asm" />
     <None Include="$(MSBuildThisFileDirectory)Blue Peach.asm" />
+    <None Include="$(MSBuildThisFileDirectory)CPU v CPU.asm" />
     <None Include="$(MSBuildThisFileDirectory)Default Competitive Rules and Camera Settings on Vs Mode Menu.asm" />
     <None Include="$(MSBuildThisFileDirectory)Default Competitive Rules and Camera Settings on Wiimmfi Menu.asm" />
     <None Include="$(MSBuildThisFileDirectory)Flag On Game Quit.asm" />
