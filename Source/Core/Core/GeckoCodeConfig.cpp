@@ -273,7 +273,7 @@ std::optional<GeckoCode::Code> DeserializeLine(const std::string& line)
   if (!TryParse(items[1], &code.data, 16))
     return std::nullopt;
 
-  return code;
+  return code ;
 }
 
 }  // namespace Gecko
