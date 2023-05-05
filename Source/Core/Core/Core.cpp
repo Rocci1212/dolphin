@@ -205,11 +205,12 @@ void OnFrameEnd()
 
     if (netplayMode)
       compatibilityMode = false;
-
+    /*
     DefaultGeckoCodes codeWriter;
     codeWriter.RunCodeInject(compatibilityMode, netplayMode);
     StateAuxillary::setBoolWroteCodes(true);
     wroteCodes = true;
+    */
   }
 
   static const u32 matchStatus = 0x80600000;
