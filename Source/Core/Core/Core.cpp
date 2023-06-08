@@ -213,7 +213,7 @@ void OnFrameEnd()
     */
   }
 
-  static const u32 matchStatus = 0x80600000;
+  static const u32 matchStatus = 0x800002FF;
   static const int matchStarted = 1;
   static const int matchStopped = 0;
 
