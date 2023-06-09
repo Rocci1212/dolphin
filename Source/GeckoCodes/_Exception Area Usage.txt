@@ -1,0 +1,2 @@
+800002FF - 800002FF = Game Status
+800002F8 - 800002FB = Is CRC Out of Sync (opportunity for space here, it's 1 if so / 0 if not)
