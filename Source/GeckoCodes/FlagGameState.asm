@@ -21,8 +21,11 @@ IDLE_START:
   lbz r28, 0x2FF (r28)		# Load flag of game status in r28
   cmpw cr2, r6, r28     # Check the game status
   bne+ cr2, FINALLY     # Get out if the game status is not (cutscenes started)
+  lis r28, 0x80c5       
+  ori r28, r28, 0xf340  # Load 0x80c5f340 into r28
+  lbz r4, 0 (r28)       # Load byte at 0x80c5f340 (Is Online) into r4
+  addi r4, r4, 1        # Add 1
   lis r28, 0x8000  			# Load 0x80000000 back into r28
-  li r4, 0x1       			# Load 1 into r4
   stb r4, 0x2FF (r28)   # Store 1 into 0x800002FF
 
 FINALLY:
