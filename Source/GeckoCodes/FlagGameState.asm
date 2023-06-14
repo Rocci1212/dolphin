@@ -1,4 +1,4 @@
-#To be inserted at 
+#To be inserted at 802849A4
 # Flag Game Status
 GAME_BEGIN:
   lis r28, 0x8000       # Load 0x80000000 into r28

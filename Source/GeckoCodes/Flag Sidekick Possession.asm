@@ -16,14 +16,14 @@ cmpw r30, r0 # compare if the pointer in r30 equals the pointer in r0 from the o
 beq CAPT_BALL
 
 SKICK_BALL:
-lis r30, 0x8060
-stb r30, 0x10 (r30)
+lis r30, 0x8000
+stb r30, 0x2FE (r30)
 b 0x10
 
 CAPT_BALL:
-lis r30, 0x8060
+lis r30, 0x8000
 ori r30, r30, 0x01
-stb r30, 0xf (r30)
+stb r30, 0x2fd (r30)
 
 FINALLY:
 mr r30, r0
