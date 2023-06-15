@@ -223,7 +223,7 @@ void OnFrameEnd()
   // match start
   if (Memory::Read_U8(matchStatus) == matchStarted && !StateAuxillary::getBoolMatchStart() &&
       !Movie::IsPlayingInput() && !Movie::IsRecordingInput() && /* !StateAuxillary::isSpectator() && */
-      Config::Get(Config::MAIN_REPLAYS))
+      Config::Get(Config::MAIN_REPLAYS_NETPLAY))
   {
     boolMatchStart = true;
     StateAuxillary::setBoolMatchStart(true);
