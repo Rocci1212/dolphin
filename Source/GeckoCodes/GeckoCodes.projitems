@@ -9,6 +9,7 @@
     <Import_RootNamespace>GeckoCodes</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory)_Exception Area Usage.txt" />
     <Content Include="$(MSBuildThisFileDirectory)Flag Sidekick Possession.asm" />
   </ItemGroup>
   <ItemGroup>

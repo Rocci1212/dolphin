@@ -264,7 +264,7 @@ void GeneralPane::LoadConfig()
       ->setChecked(Settings::Instance().IsAnalyticsEnabled());
 #endif
   SignalBlocking(m_checkbox_dualcore)->setChecked(Config::Get(Config::MAIN_CPU_THREAD));
-  SignalBlocking(m_checkbox_enableReplays)->setChecked(Config::Get(Config::MAIN_REPLAYS));
+  SignalBlocking(m_checkbox_enableReplays)->setChecked(Config::Get(Config::MAIN_REPLAYS_NETPLAY));
   SignalBlocking(m_checkbox_cheats)->setChecked(Settings::Instance().GetCheatsEnabled());
   SignalBlocking(m_checkbox_override_region_settings)
       ->setChecked(Config::Get(Config::MAIN_OVERRIDE_REGION_SETTINGS));
@@ -360,7 +360,7 @@ void GeneralPane::OnSaveConfig()
   DolphinAnalytics::Instance().ReloadConfig();
 #endif
   Config::SetBaseOrCurrent(Config::MAIN_CPU_THREAD, m_checkbox_dualcore->isChecked());
-  Config::SetBaseOrCurrent(Config::MAIN_REPLAYS, m_checkbox_enableReplays->isChecked());
+  Config::SetBaseOrCurrent(Config::MAIN_REPLAYS_NETPLAY, m_checkbox_enableReplays->isChecked());
   Settings::Instance().SetCheatsEnabled(m_checkbox_cheats->isChecked());
   Config::SetBaseOrCurrent(Config::MAIN_OVERRIDE_REGION_SETTINGS,
                            m_checkbox_override_region_settings->isChecked());

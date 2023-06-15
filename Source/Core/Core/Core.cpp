@@ -213,7 +213,7 @@ void OnFrameEnd()
     */
   }
 
-  static const u32 matchStatus = 0x80600000;
+  static const u32 matchStatus = 0x800002FF;
   static const int matchStarted = 1;
   static const int matchStopped = 0;
 
@@ -223,7 +223,7 @@ void OnFrameEnd()
   // match start
   if (Memory::Read_U8(matchStatus) == matchStarted && !StateAuxillary::getBoolMatchStart() &&
       !Movie::IsPlayingInput() && !Movie::IsRecordingInput() && /* !StateAuxillary::isSpectator() && */
-      Config::Get(Config::MAIN_REPLAYS))
+      Config::Get(Config::MAIN_REPLAYS_NETPLAY))
   {
     boolMatchStart = true;
     StateAuxillary::setBoolMatchStart(true);
