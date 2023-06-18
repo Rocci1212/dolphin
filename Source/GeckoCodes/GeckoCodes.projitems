@@ -23,6 +23,8 @@
     <None Include="$(MSBuildThisFileDirectory)CPU v CPU.asm" />
     <None Include="$(MSBuildThisFileDirectory)Default Competitive Rules and Camera Settings on Vs Mode Menu.asm" />
     <None Include="$(MSBuildThisFileDirectory)Default Competitive Rules and Camera Settings on Wiimmfi Menu.asm" />
+    <None Include="$(MSBuildThisFileDirectory)Fix Random Seed Desyncs - Console.asm" />
+    <None Include="$(MSBuildThisFileDirectory)Fix Random Seed Desyncs - Dolphin.asm" />
     <None Include="$(MSBuildThisFileDirectory)Flag On Game Quit.asm" />
     <None Include="$(MSBuildThisFileDirectory)FlagGameState.asm" />
     <None Include="$(MSBuildThisFileDirectory)Game Point Sudden Death.asm" />
