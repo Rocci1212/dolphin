@@ -9,12 +9,21 @@ SHOT_RELEASE:
   # https://mariokartwii.com/showthread.php?tid=873
   stwu sp, -0x0050 (sp) # make space for 18 registers
   stmw r14, 0x8 (sp)    # push r14-r31 onto the stack pointer
-  lis r14, 0x8000			# set r14 to 80000000
+
+CHECK_VERSUS_MODE:
+  lis r14, 0x80c5
+  ori r14, r14, 0xf33f  # set r14 to 80c5f33f
+  lbz r14, 0 (r14)      # are we in versus mode? is this gonna be 1 for in-game ranked matches?
+  cmpwi r14, 0          # versus mode = 0
+  bne CLEAN_UP          # if not, get outta here
+
+
+
   lbz r14, 0x2fe(r14)		 # set r14 now to the byte at 0x800002fe (location that flags captain possession)
-  cmpwi r14, 0x0			# does the sidekick have the ball?
+  cmpwi r14, 0x0        # does the sidekick have the ball?
   lis r15, 0x80c5			
-  ori r15, r15, 0xf340		# load 0x80c5f340 into r15 (address contains value of whether we're online)
-  lwz r15, 0 (r15)			# store the value there
+  ori r15, r15, 0xf340  # load 0x80c5f340 into r15 (address contains value of whether we're online)
+  lwz r15, 0 (r15)      # store the value there
   bne CLASSIC_MODE
   lis r3, 0x80C5
   ori r3, r3, 0xF300
