@@ -1,5 +1,6 @@
 #To be inserted at 802849A4
 # Flag Game Status
+# TODO: this needs to store the Player Cheat to 800002FD
 GAME_BEGIN:
   lis r28, 0x8000       # Load 0x80000000 into r28
   cmpwi cr2, r6, 0x9    # Check if GameBegin is being called
