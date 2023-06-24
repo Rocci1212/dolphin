@@ -14,7 +14,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)All Fast Stadiums.asm" />
-    <None Include="$(MSBuildThisFileDirectory)Better Training Mode.asm" />
+    <None Include="$(MSBuildThisFileDirectory)Better Training Mode Part 1.asm" />
+    <None Include="$(MSBuildThisFileDirectory)Better Training Mode Part 2.asm" />
     <None Include="$(MSBuildThisFileDirectory)Blue Peach - Fix Kritter Gloves.asm" />
     <None Include="$(MSBuildThisFileDirectory)Blue Peach - Fix Sidekick Menu Crash.asm" />
     <None Include="$(MSBuildThisFileDirectory)Blue Peach - Fix Stadium Banners 2.asm" />
