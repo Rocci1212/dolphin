@@ -13,9 +13,9 @@ GET_IS_ONLINE:
   lbz r4, 0 (r4)        # load the value in (0 if off-line, 1 if online)
   cmpwi cr3, r4, 0      # are we online, or offline? store it in condition register 3
   lis r4, 0x80c5        # get ready for finding the address of the player cheat
+  bne cr3, GET_PLAYER_CHEAT_ONLINE  # if r4 = 1, then we're online, get the value there
 
 GET_PLAYER_CHEAT_OFFLINE:
-  bne cr3, GET_PLAYER_CHEAT_ONLINE  # if r4 = 1, then we're online, get the value there
   ori r4, r4, 0xf307    
   lbz r4, 0 (r4)        # load value in the player cheats (offline) into memory
   b STORE_PLAYER_CHEAT  # go to place where we store it
