@@ -1,7 +1,6 @@
-#To be inserted at 800966f8
+#To be inserted at 800966fc
 # in this code, i am moving r30 to r0 for storage, and then back to r30 at the end
 # r0 gets wiped after this anyway, so it's free to use
-# TODO: this needs to also apply the player cheat
 mr r0, r30
 cmpwi r31, 0 # make sure possession is being flagged (as opposed to dispossession which sets r31 to 0)
 beq SKICK_BALL
@@ -28,4 +27,4 @@ stb r30, 0x2fd (r30)
 
 FINALLY:
 mr r30, r0
-stw r31, 0x0310 (r30)
+lwz r31, 0xc (sp)
