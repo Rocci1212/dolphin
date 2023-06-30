@@ -14,6 +14,7 @@
     <Content Include="$(MSBuildThisFileDirectory)Flag Sidekick Possession.asm" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="$(MSBuildThisFileDirectory)Add Version To Main Menu.asm" />
     <None Include="$(MSBuildThisFileDirectory)All Fast Stadiums.asm" />
     <None Include="$(MSBuildThisFileDirectory)Better Training Mode Part 1.asm" />
     <None Include="$(MSBuildThisFileDirectory)Better Training Mode Part 2.asm" />
