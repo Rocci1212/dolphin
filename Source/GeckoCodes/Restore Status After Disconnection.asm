@@ -76,7 +76,7 @@ STRUCT_IS_LOADED:
 ### CHECK IF SAFE MEGASTRIKES SELECTED ###
   crclr 22				# set condition register 5 equal bit to false, this way timer will decrease at the end of this code
   lbz r28, 0xFFFFf29f (r12)
-  cmpwi r28, 2				# Check if safe megas selected. if it is then restore match status
+  cmpwi r28, 0xcd				# Check if safe megas selected. if it is then restore match status - comparing to 0xcd effectively disables restoration since im handling that elsewhere
   bne+ END
 ### LOAD THE BACK UP ###
   lbz r3, 0x1cc (r11)				# Load copy of home score 
