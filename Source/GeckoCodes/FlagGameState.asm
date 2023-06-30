@@ -26,47 +26,6 @@ GET_PLAYER_CHEAT_ONLINE:
   cmpwi r4, 2           # check if safe megas selected - if so, restore match status
   bne STORE_PLAYER_CHEAT
 
-RESTORE_MATCH_STATUS:
-  stwu sp, -0x50 (sp)   # make some space for registers
-  stmw r14, 0x8 (sp)    # push r14-r31 onto the stack pointer
-
-  lis r23, 0x806d
-  ori r23, r23, 0xf9d8  # load 806df9d8 into r23 - this is the game state struct
-  lwz r23, 0 (r23)      # load value from it's address into it
-
-  lis r22, 0x8000       # load 80000000 into r22 - we'll be able to access feder's game backup from there
-
-LOAD_THE_BACKUP:
-  lbz r24, 0x1cc (r23)    # load current home score
-  lbz r25, 0x1cd (r23)  # load current away score
-  lwz r14, 0x1bc (r23)   # home item 1
-  lbz r15, 0x1b8 (r23)   # home item 1 quantity
-  lwz r16, 0x1c0 (r23)   # home item 2
-  lbz r17, 0x1b9 (r23)   # home item 2 quantity
-  lwz r18, 0x1c4 (r23)  # away item 1
-  lbz r19, 0x1ba (r23)  # away item 1 quantity
-  lwz r20, 0x1c8 (r23)  # away item 2
-  lbz r21, 0x1bb (r23)  # away item 2 quantity
-
-RESTORE_THE_BACKUP:
-  stb r24, 0x7 (r23)				# Update current home score
-  stb r24, 0x182b (r23)				# Update current home score (visually)
-  stb r25, 0xb6f (r23)				# Update current away score
-  stb r25, 0x182f (r23)				# Update current away score (visually)
-  stw r14, 0x8c (r23)				# home item 1
-  stb r15, 0x93 (r23)				# home item 1 quantity
-  stw r16, 0x98 (r23)				# home item 2
-  stb r17, 0x9f (r23)				# home item 2 quantity
-  stw r18, 0xbf4 (r23)				# away item 1
-  stb r19, 0xbfb (r23)				# away item 1 quantity
-  stw r20, 0xc00 (r23)				# away item 2
-  stb r21, 0xc07 (r23)				# away item 2 quantity
-
-END_RESTORE_MATCH_STATUS:
-  lmw r14, 0x8 (sp)     # pop r14-r31 off the stack pointer
-  addi sp, sp, 0x0050   # release the space
-  b STORE_PLAYER_CHEAT  # go to place where we store it
-
 STORE_PLAYER_CHEAT:
   stb r4, 0x2fd (r28)   # Store Player Cheat into 0x800002FD
   b FINALLY             # Go to original instruction
@@ -87,6 +46,46 @@ IDLE_START:
   lis r28, 0x8000  			# Load 0x80000000 back into r28
   li r4, 0x1       			# Load 1 into r4
   stb r4, 0x2FF (r28)   # Store 1 into 0x800002FF
+
+RESTORE_MATCH_STATUS:
+  stwu sp, -0x50 (sp)   # make some space for registers
+  stmw r14, 0x8 (sp)    # push r14-r31 onto the stack pointer
+
+  lis r23, 0x806d
+  ori r23, r23, 0xf9d8  # load 806df9d8 into r23 - this is the game state struct
+  lwz r23, 0 (r23)      # load value from it's address into it
+
+  lis r22, 0x8000       # load 80000000 into r22 - we'll be able to access feder's game backup from there
+
+LOAD_THE_BACKUP:
+  lbz r24, 0x1cc (r22)    # load current home score
+  lbz r25, 0x1cd (r22)  # load current away score
+  lwz r14, 0x1bc (r22)   # home item 1
+  lbz r15, 0x1b8 (r22)   # home item 1 quantity
+  lwz r16, 0x1c0 (r22)   # home item 2
+  lbz r17, 0x1b9 (r22)   # home item 2 quantity
+  lwz r18, 0x1c4 (r22)  # away item 1
+  lbz r19, 0x1ba (r22)  # away item 1 quantity
+  lwz r20, 0x1c8 (r22)  # away item 2
+  lbz r21, 0x1bb (r22)  # away item 2 quantity
+
+RESTORE_THE_BACKUP:
+  stb r24, 0x7 (r23)				# Update current home score
+  stb r24, 0x182b (r23)				# Update current home score (visually)
+  stb r25, 0xb6f (r23)				# Update current away score
+  stb r25, 0x182f (r23)				# Update current away score (visually)
+  stw r14, 0x8c (r23)				# home item 1
+  stb r15, 0x93 (r23)				# home item 1 quantity
+  stw r16, 0x98 (r23)				# home item 2
+  stb r17, 0x9f (r23)				# home item 2 quantity
+  stw r18, 0xbf4 (r23)				# away item 1
+  stb r19, 0xbfb (r23)				# away item 1 quantity
+  stw r20, 0xc00 (r23)				# away item 2
+  stb r21, 0xc07 (r23)				# away item 2 quantity
+
+END_RESTORE_MATCH_STATUS:
+  lmw r14, 0x8 (sp)     # pop r14-r31 off the stack pointer
+  addi sp, sp, 0x0050   # release the space
 
 FINALLY:
   add r3, r29, r6  			# Original instruction at 0x802849a4
