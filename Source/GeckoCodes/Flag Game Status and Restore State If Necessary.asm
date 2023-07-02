@@ -55,7 +55,14 @@ RESTORE_MATCH_STATUS:
   ori r23, r23, 0xf9d8  # load 806df9d8 into r23 - this is the game state struct
   lwz r23, 0 (r23)      # load value from it's address into it
 
+  lis r26, 0x80c5
+  ori r26, r26, 0xf29f    # load 80c5f29f (location of player cheat) into r26
+  lbz r26, 0 (r26)
+
   lis r22, 0x8000       # load 80000000 into r22 - we'll be able to access feder's game backup from there
+
+  cmpwi r26, 2           # compare with 2 (safe megas - this will be the restore match status cheat)
+  bne END_RESTORE_MATCH_STATUS
 
 LOAD_THE_BACKUP:
   lbz r24, 0x1cc (r22)    # load current home score
