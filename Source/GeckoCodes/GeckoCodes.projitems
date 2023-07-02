@@ -9,7 +9,7 @@
     <Import_RootNamespace>GeckoCodes</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="$(MSBuildThisFileDirectory)Restore Status After Disconnection.asm" />
+    <Content Include="$(MSBuildThisFileDirectory)Log Game Status.asm" />
     <Content Include="$(MSBuildThisFileDirectory)_Exception Area Usage.txt" />
     <Content Include="$(MSBuildThisFileDirectory)Flag Sidekick Possession.asm" />
   </ItemGroup>
@@ -30,7 +30,7 @@
     <None Include="$(MSBuildThisFileDirectory)Fix Random Seed Desyncs - Console.asm" />
     <None Include="$(MSBuildThisFileDirectory)Fix Random Seed Desyncs - Dolphin.asm" />
     <None Include="$(MSBuildThisFileDirectory)Flag On Game Quit.asm" />
-    <None Include="$(MSBuildThisFileDirectory)Flag Game Status.asm" />
+    <None Include="$(MSBuildThisFileDirectory)Flag Game Status and Restore State If Necessary.asm" />
     <None Include="$(MSBuildThisFileDirectory)Game Point Sudden Death.asm" />
     <None Include="$(MSBuildThisFileDirectory)Mark Desyncs.asm" />
     <None Include="$(MSBuildThisFileDirectory)No Megas.asm" />
