@@ -30,7 +30,7 @@
     <None Include="$(MSBuildThisFileDirectory)Fix Random Seed Desyncs - Console.asm" />
     <None Include="$(MSBuildThisFileDirectory)Fix Random Seed Desyncs - Dolphin.asm" />
     <None Include="$(MSBuildThisFileDirectory)Flag On Game Quit.asm" />
-    <None Include="$(MSBuildThisFileDirectory)FlagGameState.asm" />
+    <None Include="$(MSBuildThisFileDirectory)Flag Game Status.asm" />
     <None Include="$(MSBuildThisFileDirectory)Game Point Sudden Death.asm" />
     <None Include="$(MSBuildThisFileDirectory)Mark Desyncs.asm" />
     <None Include="$(MSBuildThisFileDirectory)No Megas.asm" />
