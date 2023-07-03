@@ -1,4 +1,5 @@
 #To be inserted at 802849A4
+#To be inserted at 802849A4
 # Flag Game Status
 GAME_BEGIN:
   lis r28, 0x8000       # Load 0x80000000 into r28
@@ -67,10 +68,10 @@ RESTORE_MATCH_STATUS:
 LOAD_THE_BACKUP:
   lbz r24, 0x1cc (r22)    # load current home score
   lbz r25, 0x1cd (r22)  # load current away score
-  lwz r14, 0x1bc (r22)   # home item 1
-  lbz r15, 0x1b8 (r22)   # home item 1 quantity
-  lwz r16, 0x1c0 (r22)   # home item 2
-  lbz r17, 0x1b9 (r22)   # home item 2 quantity
+  lwz r14, 0x1c0 (r22)   # home item 1
+  lbz r15, 0x1b9 (r22)   # home item 1 quantity
+  lwz r16, 0x1bc (r22)   # home item 2
+  lbz r17, 0x1b8 (r22)   # home item 2 quantity
   lwz r18, 0x1c4 (r22)  # away item 1
   lbz r19, 0x1ba (r22)  # away item 1 quantity
   lwz r20, 0x1c8 (r22)  # away item 2
@@ -96,3 +97,5 @@ END_RESTORE_MATCH_STATUS:
 
 FINALLY:
   add r3, r29, r6  			# Original instruction at 0x802849a4
+
+###
