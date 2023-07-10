@@ -1,4 +1,5 @@
 #To be inserted at 800966fc
+# Used at [$Required: No Megastrikes] at R4QP01.ini
 # in this code, i am moving r30 to r0 for storage, and then back to r30 at the end
 # r0 gets wiped after this anyway, so it's free to use
   mr r0, r30

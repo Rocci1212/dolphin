@@ -1,9 +1,5 @@
 #To be inserted at 800FCA80
-# Updates to be made to this
-# I need to know if I'm online or offline
-# If offline, this code works fine
-# If online, that is to say, word? at 80c5f340 = 1
-# Then I need to set 80c5f29c to 3, not 80c5f304 as below
+# Used at [$Required: No Megastrikes] at R4QP01.ini
 SHOT_RELEASE:
   # I use a technique called Pushing/Popping the stack here, as shown here:
   # https://mariokartwii.com/showthread.php?tid=873

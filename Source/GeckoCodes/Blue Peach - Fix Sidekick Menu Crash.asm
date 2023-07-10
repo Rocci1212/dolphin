@@ -1,4 +1,5 @@
 #To be inserted at 801C51F0
+# Used at [$Recommended: Blue Peach vs Red or Orange Opponents] at R4QP01.ini
 loc_0x0:
   stw r29, 8(r3)
   lis r3, 0x8050

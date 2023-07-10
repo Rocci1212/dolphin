@@ -1,4 +1,5 @@
 #To be inserted at 8031c638
+# Used at [$Required: Flag Game Status and Restore Game State if Necessary] at R4QP01.ini
 START:
 ########### PUSH r14-r31 INTO THE STACK
   stwu sp, -0x0050 (sp) #make space for 18 registers

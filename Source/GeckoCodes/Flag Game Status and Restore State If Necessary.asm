@@ -1,4 +1,5 @@
 #To be inserted at 802849A4
+# Used at [$Required: Flag Game Status and Restore Game State if Necessary] at R4QP01.ini
 # Flag Game Status
 GAME_BEGIN:
   lis r28, 0x8000       # Load 0x80000000 into r28
