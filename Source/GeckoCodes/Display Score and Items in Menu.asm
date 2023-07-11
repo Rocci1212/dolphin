@@ -70,7 +70,86 @@ SCORES:
   # write home score
   lbz r18, 0x1cc (r19)
   addi r18, r18, 0x30
+  sth r18, 0 (r16)
 
+  # write "-" character
+  li r18, 0x2d
+  sth r18, 2 (r16)
+
+  # write away score
+  lbz r18, 0x1cd (r19)
+  addi r18, r18, 0x30
+  sth r18, 4 (r16)
+
+  # write space character
+  lis r18, 0x20
+  sth r18, 6 (r16)
+
+  bl BRANCH_LINK_2
+  .long 0x4772656E			#Gren ID:0
+  .long 0x52656420 			#Red  ID:1
+  .long 0x5370696E 			#Spin ID:2
+  .long 0x426C7565 			#Blue ID:3
+  .long 0x42616E61 			#Bana ID:4
+  .long 0x426F6D62 			#Bomb ID:5
+  .long 0x43686D70 			#Chmp ID:6
+  .long 0x5368726D 			#Shrm ID:7 
+  .long 0x53746172 			#Star ID:8
+  .long 0x43617074 			#Capt
+  .long 0x4E4F4E45			#NONE
+
+BRANCH_LINK_2:
+  addi r20, r19, 0x1b8  # r20 now points to 0x80000xb8: address of first home item qty
+  li r21, 7			# r21 value = 7. r21 will be an important register to keep track if the loop's current state. r20+r21 will always point to the item ID
+
+ITEM_LOOP:
+  mflr r17              # copy value of link register into r17
+  add r22, r20, r21     # r22 will temporarily become the sum of r20 and r21 to point to the item id
+  lbz r22, 0 (r22)      # load item id
+  cmpwi cr2, r22, 0xff  # ff = no item
+  cmpwi cr3, r22, 0x9   # >= 9 means Captain
+  blt cr3, ITS_NOT_CAPT
+  li r22, 0x9
+
+ITS_NOT_CAPT:
+  bne cr2, ITS_NOT_NONE
+  li r22, 0xa           
+
+ITS_NOT_NONE:
+  mulli r22, r22, 4
+  add r17, r17, r22     # add to the value in r17 the value of the item ID multiplied by 4. This way r11 will point to the correct item text
+
+ # now it's time to write the item name
+  lbz r18, 0 (r17)
+  sth r18, 8 (r16)
+  lbz r18, 1 (r17)
+  sth r18, 10 (r16)
+  lbz r18, 2 (r17)
+  sth r18, 12 (r16)
+  lbz r18, 3 (r17)
+  sth r18, 14 (r16)
+
+  # store quantity number 
+  lbz r18, 0 (r20)
+  addi r18, r18, 0x30
+  sth r22, 16 (r16)
+
+  # write "-" character
+  li r22, 0x2d
+  sth r22, 18 (r16)
+
+  # loop conditions and counters
+  addi r20, r20, 1      # increase r20 by 1, so it will point to next item's qty
+  addi r21, r21, 3      # increase r21 by 3 so r20+r21 will point to next item
+  addi r16, r16, 12     # increase r16 by 12 so it will point to the next string of text
+  cmpwi cr2, 0x11       # check if r21 is now bigger than r20, if so then that means the 4th iteration of the loop just concluded
+  blt ITEM_LOOP
+
+  # write null char to end string
+  li r18, 0x0
+  sth r18, 8 (r16)
+
+END:
   mtlr r0               # link register is backed up at 802eb1e0 which is nice for saving a line of code
 
 ########### POP r14-r31 FROM THE STACK
@@ -78,4 +157,5 @@ SCORES:
   addi sp, sp, 0x0050   # release the space
 
   mr r30, r3            # original instruction at 8023B1EC
+
 
