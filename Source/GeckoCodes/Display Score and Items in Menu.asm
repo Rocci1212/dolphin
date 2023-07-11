@@ -143,7 +143,7 @@ ITS_NOT_NONE:
   addi r21, r21, 3      # increase r21 by 3 so r20+r21 will point to next item
   addi r16, r16, 12     # increase r16 by 12 so it will point to the next string of text
   cmpwi cr2, 0x11       # check if r21 is now bigger than r20, if so then that means the 4th iteration of the loop just concluded
-  blt ITEM_LOOP
+  blt cr2, ITEM_LOOP
 
   # write null char to end string
   li r18, 0x0
