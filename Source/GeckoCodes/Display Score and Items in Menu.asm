@@ -82,7 +82,7 @@ SCORES:
   sth r18, 4 (r16)
 
   # write space character
-  lis r18, 0x20
+  li r18, 0x20
   sth r18, 6 (r16)
 
   bl BRANCH_LINK_2
@@ -101,6 +101,7 @@ SCORES:
 BRANCH_LINK_2:
   addi r20, r19, 0x1b8  # r20 now points to 0x80000xb8: address of first home item qty
   li r21, 7			# r21 value = 7. r21 will be an important register to keep track if the loop's current state. r20+r21 will always point to the item ID
+  li r23, 0
 
 ITEM_LOOP:
   mflr r17              # copy value of link register into r17
@@ -132,7 +133,7 @@ ITS_NOT_NONE:
   # store quantity number 
   lbz r18, 0 (r20)
   addi r18, r18, 0x30
-  sth r22, 16 (r16)
+  sth r18, 16 (r16)
 
   # write "-" character
   li r22, 0x2d
@@ -142,12 +143,13 @@ ITS_NOT_NONE:
   addi r20, r20, 1      # increase r20 by 1, so it will point to next item's qty
   addi r21, r21, 3      # increase r21 by 3 so r20+r21 will point to next item
   addi r16, r16, 12     # increase r16 by 12 so it will point to the next string of text
-  cmpwi cr2, 0x11       # check if r21 is now bigger than r20, if so then that means the 4th iteration of the loop just concluded
+  addi r23, r23, 1
+  cmpwi cr2, r23, 4     # check if r21 is now bigger than r20, if so then that means the 4th iteration of the loop just concluded
   blt cr2, ITEM_LOOP
 
   # write null char to end string
   li r18, 0x0
-  sth r18, 8 (r16)
+  sth r18, 6 (r16)
 
 END:
   mtlr r0               # link register is backed up at 802eb1e0 which is nice for saving a line of code
