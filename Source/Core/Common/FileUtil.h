@@ -5,6 +5,7 @@
 
 #include <cstddef>
 #include <fstream>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <vector>
@@ -216,6 +217,8 @@ void SetUserPath(unsigned int dir_index, std::string path);
 
 // probably doesn't belong here
 std::string GetThemeDir(const std::string& theme_name);
+
+std::optional<std::string> GetStylesDir(const std::string& style_name);
 
 // Returns the path to where the sys file are
 const std::string& GetSysDirectory();
