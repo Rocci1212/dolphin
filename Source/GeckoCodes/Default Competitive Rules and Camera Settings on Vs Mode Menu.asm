@@ -1,4 +1,5 @@
 #To be inserted at 802337C8
+# Used at [$Required: Default Competitive Rules and Camera Settings for VS mode] at R4QP01.ini
 # Static immediate loads to r28 and r27 happen write after this,
 #   opening these registers up for operations here. For each of these,
 #   I'm writing the value in r28 into the address at r27

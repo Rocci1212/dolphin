@@ -1,4 +1,5 @@
 #To be inserted at 803332D8
+# Used at [$Required: Enable Crossplay] in R4QP01.ini
 # Mark Desyncs
 # Code should write a value to memory when the game desyncs
   cmplw	r3, r0         # our original instruction is a compare

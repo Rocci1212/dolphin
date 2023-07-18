@@ -1,4 +1,5 @@
 #To be inserted at 8026382c
+# Used at [$Required: Default Competitive Rules and Camera Settings for Wiimmfi] at R4QP01.ini
 # Static immediate loads to r6 and r7 happen write after this,
 #   opening these registers up for operations here. For each of these,
 #   I'm writing the value in r6 into the address at r7

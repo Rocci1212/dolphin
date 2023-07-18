@@ -1,4 +1,5 @@
 #To be inserted at 800081f0
+# Used at [$Required: Fast Stadia] at R4QP01.ini
   lis r0, 0x909B        
   ori r0, r0, 0x6530    # Set r0 to 909B6530 - assumption here is bounce gets set last
   cmpw r0, r31          # Compare with r31
