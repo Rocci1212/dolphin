@@ -22,6 +22,7 @@
 #include "Core/IOS/ES/ES.h"
 #include "Core/IOS/ES/Formats.h"
 #include "DiscIO/Volume.h"
+#include "Core/PowerPC/PowerPC.h"
 
 template <u32 addr>
 class RegisterWrapper
@@ -179,8 +180,8 @@ std::optional<DIDevice::DIResult> DIDevice::StartIOCtl(const IOCtlRequest& reque
   {
     const u32 length = Memory::Read_U32(request.buffer_in + 4);
     const u32 position = Memory::Read_U32(request.buffer_in + 8);
-    INFO_LOG_FMT(IOS_DI, "DVDLowRead: offset {:#010x} (byte {:#011x}), length {:#x}", position,
-                 static_cast<u64>(position) << 2, length);
+    INFO_LOG_FMT(IOS_DI, "DVDLowRead: offset {:#010x} (byte {:#011x}), length {:#x} | PC: {:08x}", position,
+                 static_cast<u64>(position) << 2, length, PC);
     if (m_current_partition == DiscIO::PARTITION_NONE)
     {
       ERROR_LOG_FMT(IOS_DI, "Attempted to perform a decrypting read when no partition is open!");
