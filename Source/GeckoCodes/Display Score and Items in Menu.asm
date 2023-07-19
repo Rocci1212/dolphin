@@ -1,6 +1,11 @@
 # To be inserted at 8023B1EC
 # Used at [$Required: Flag Game Status and Restore Game State if Necessary] at R4QP01.ini
 BEGIN:
+  lis r30, 0x8000
+  lbz r30, 0x2ff (r30)
+  cmpwi cr2, r30, 2
+  bne- cr2, END
+
 ########### PUSH r14-r31 INTO THE STACK
   stwu sp, -0x0050 (sp) # make space for 18 registers
   stmw r14, 0x8 (sp)    # push r14-r31 onto the stack pointer
@@ -152,13 +157,14 @@ ITS_NOT_NONE:
   li r18, 0x0
   sth r18, 6 (r16)
 
-END:
+CLEAN_UP:
   mtlr r0               # link register is backed up at 802eb1e0 which is nice for saving a line of code
 
 ########### POP r14-r31 FROM THE STACK
   lmw r14, 0x8 (sp)     # pop r14-r31 off the stack pointer
   addi sp, sp, 0x0050   # release the space
 
+END:
   mr r30, r3            # original instruction at 8023B1EC
 
 

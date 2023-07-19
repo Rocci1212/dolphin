@@ -23,7 +23,7 @@
   ori r29, r29, 0x2e     # .
   lis r30, 0x34          # 4
   ori r30, r30, 0x2e     # .
-  lis r31, 0x30          # 0
+  lis r31, 0x31          # 1
 
   stmw r23, 0 (r14)
     
