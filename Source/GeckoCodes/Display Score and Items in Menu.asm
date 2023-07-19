@@ -3,8 +3,8 @@
 BEGIN:
   lis r30, 0x8000
   lbz r30, 0x2ff (r30)
-  cmpwi cr2, r30, 2
-  bne- cr2, END
+  andi r30, r30, 2
+  cmpwi cr4, r30, 2
 
 ########### PUSH r14-r31 INTO THE STACK
   stwu sp, -0x0050 (sp) # make space for 18 registers
@@ -67,6 +67,7 @@ ONLYKRITTER_LOOP:
   bne cr2, ONLYKRITTER_LOOP
 
 SCORES:
+  bne- cr4, END         # if it's not disconnected or connection lost, there's no need to restore
   # note: we don't have the room to store scores greater than 9
   lis r19, 0x8000       # point r19 to exception area where game status variables are kept
   lis r16, 0x1          
@@ -157,14 +158,13 @@ ITS_NOT_NONE:
   li r18, 0x0
   sth r18, 6 (r16)
 
-CLEAN_UP:
+END:
   mtlr r0               # link register is backed up at 802eb1e0 which is nice for saving a line of code
 
 ########### POP r14-r31 FROM THE STACK
   lmw r14, 0x8 (sp)     # pop r14-r31 off the stack pointer
   addi sp, sp, 0x0050   # release the space
 
-END:
   mr r30, r3            # original instruction at 8023B1EC
 
 

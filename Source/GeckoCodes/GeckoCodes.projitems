@@ -27,6 +27,7 @@
     <None Include="$(MSBuildThisFileDirectory)CPU v CPU.asm" />
     <None Include="$(MSBuildThisFileDirectory)Default Competitive Rules and Camera Settings on Vs Mode Menu.asm" />
     <None Include="$(MSBuildThisFileDirectory)Default Competitive Rules and Camera Settings on Wiimmfi Menu.asm" />
+    <None Include="$(MSBuildThisFileDirectory)Mark Connections Lost.asm" />
     <None Include="$(MSBuildThisFileDirectory)Mark Random Seed Desyncs.asm" />
     <None Include="$(MSBuildThisFileDirectory)Display Score and Items in Menu.asm" />
     <None Include="$(MSBuildThisFileDirectory)Fix Random Seed Desyncs - Console.asm" />
