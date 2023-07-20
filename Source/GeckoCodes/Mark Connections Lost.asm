@@ -1,4 +1,5 @@
 #To be inserted at 803270e0
+# Used at [$Required: Flag Game Status and Restore Game State if Necessary] at R4QP01.ini
   lis r3, 0x8000
   ori r3, r3, 3      # load 80000003 into r3
   stb r3, 0x2fc (r3)  # store 3 at 0x800002ff
