@@ -1,6 +1,11 @@
 # To be inserted at 8023B1EC
 # Used at [$Required: Flag Game Status and Restore Game State if Necessary] at R4QP01.ini
 BEGIN:
+  lis r30, 0x8000
+  lbz r30, 0x2ff (r30)
+  andi r30, r30, 2
+  cmpwi cr4, r30, 2
+
 ########### PUSH r14-r31 INTO THE STACK
   stwu sp, -0x0050 (sp) # make space for 18 registers
   stmw r14, 0x8 (sp)    # push r14-r31 onto the stack pointer
@@ -62,6 +67,7 @@ ONLYKRITTER_LOOP:
   bne cr2, ONLYKRITTER_LOOP
 
 SCORES:
+  bne- cr4, END         # if it's not disconnected or connection lost, there's no need to restore
   # note: we don't have the room to store scores greater than 9
   lis r19, 0x8000       # point r19 to exception area where game status variables are kept
   lis r16, 0x1          

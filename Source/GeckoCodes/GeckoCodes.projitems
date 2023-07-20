@@ -27,13 +27,15 @@
     <None Include="$(MSBuildThisFileDirectory)CPU v CPU.asm" />
     <None Include="$(MSBuildThisFileDirectory)Default Competitive Rules and Camera Settings on Vs Mode Menu.asm" />
     <None Include="$(MSBuildThisFileDirectory)Default Competitive Rules and Camera Settings on Wiimmfi Menu.asm" />
+    <None Include="$(MSBuildThisFileDirectory)Mark Connections Lost.asm" />
+    <None Include="$(MSBuildThisFileDirectory)Mark Random Seed Desyncs.asm" />
     <None Include="$(MSBuildThisFileDirectory)Display Score and Items in Menu.asm" />
     <None Include="$(MSBuildThisFileDirectory)Fix Random Seed Desyncs - Console.asm" />
     <None Include="$(MSBuildThisFileDirectory)Fix Random Seed Desyncs - Dolphin.asm" />
     <None Include="$(MSBuildThisFileDirectory)Flag On Game Quit.asm" />
     <None Include="$(MSBuildThisFileDirectory)Flag Game Status and Restore State If Necessary.asm" />
     <None Include="$(MSBuildThisFileDirectory)Game Point Sudden Death.asm" />
-    <None Include="$(MSBuildThisFileDirectory)Mark Desyncs.asm" />
+    <None Include="$(MSBuildThisFileDirectory)Mark and Skip CRC Desyncs.asm" />
     <None Include="$(MSBuildThisFileDirectory)No Megas.asm" />
     <None Include="$(MSBuildThisFileDirectory)SkipOpening.asm" />
     <None Include="$(MSBuildThisFileDirectory)Unlock All Challenges for Cheats.asm" />
