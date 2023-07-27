@@ -1,20 +1,9 @@
-# back up link register
-# set link register to nlPrint
-# set data to custom text
-# branch and link to nlPrint
-# restore link register when complete
-
-# put a couple breakpoints in dolphin:
-one at 8031c62c
-and one before it at some point
-
-when we hit the one before, put a breakpoint in HLE_OS.cpp at Line 57, that way we can see why it's not logging
-Rough draft (not working):
-
-START:
-  lwz r30, 0x288 (sp) # original instruction
-  
+#To be inserted at 80330940
   # push and pop the stack
+
+  cmpwi r28, 0
+  bne FINALLY
+
   stwu sp, -0x0050 (sp) #make space for 18 registers
   stmw r14, 0x8 (sp) #push r14-r31 onto the stack pointer
 
@@ -27,6 +16,7 @@ START:
   # set data to custom text
   mr r15, r3 # backup r3
   mr r16, r4 # backup r4
+  mflr r17   # backup link register
   lis r3, 0x8060 #set r3 to custom text
   lis r4, 0x80c2
   lwz r4, 0x4180 (r4) # set r4 to the frame #
@@ -37,6 +27,11 @@ CLEAN_UP:
   mr r3, r15 # restore r3
   mr r4, r16 # restore r4
   mtctr r14  # restore count register
+  mtlr r17   # restore link register
 
   lmw r14, 0x8 (sp) #pop r14-r31 off the stack pointer
   addi sp, sp, 0x0050 #release the space  
+
+FINALLY:
+  sth	r0, 0x0088 (r3) # original instruction at 80330940
+
