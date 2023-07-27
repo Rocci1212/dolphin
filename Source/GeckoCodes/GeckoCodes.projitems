@@ -12,6 +12,7 @@
     <Content Include="$(MSBuildThisFileDirectory)Log Game Status.asm" />
     <Content Include="$(MSBuildThisFileDirectory)_Exception Area Usage.txt" />
     <Content Include="$(MSBuildThisFileDirectory)Flag Sidekick Possession.asm" />
+    <Content Include="$(MSBuildThisFileDirectory)_STRATEGY FOR CUSTOM LOGGING.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)Add Version To Main Menu.asm" />
