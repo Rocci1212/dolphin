@@ -10,6 +10,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="$(MSBuildThisFileDirectory)Log Game Status.asm" />
+    <Content Include="$(MSBuildThisFileDirectory)NOTES FOR LOGGING BUTTON INPUTS.txt" />
     <Content Include="$(MSBuildThisFileDirectory)_Exception Area Usage.txt" />
     <Content Include="$(MSBuildThisFileDirectory)Flag Sidekick Possession.asm" />
   </ItemGroup>
