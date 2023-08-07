@@ -31,7 +31,7 @@ void HLE_LogFPrint(ParameterType parameter_type);
 // these are meant to reduce noise in the dolphin log file, and should be set to false when not trying to isolate an issue
 bool ignoreWPADsampling = true;
 bool ignoreRpcController = true;
-bool ignoreGameEvents = false;
+bool ignoreGameEvents = true;
 bool ignoreSoundEvents = true; 
 
 void HLE_OSPanic()
