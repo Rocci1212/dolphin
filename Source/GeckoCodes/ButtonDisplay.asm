@@ -1,6 +1,6 @@
 loc_0x0:
   lis r12, 0x8058
-  lhz r3, 24290(r12)
+  lhz r3, 0x5ee2 (r12)
   andi. r10, r3, 0x2000
   bne- loc_0x38
   andi. r10, r3, 0x400
