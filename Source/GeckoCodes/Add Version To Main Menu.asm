@@ -31,7 +31,6 @@
   addi r15, r15, 0x6000  
   addi r15, r15, 0x6000  
   addi r15, r15, 0x4000  # add 18000 to r0 to get us to the right spot in memory
-  addi r15, r15, 0x442
   mr r16, r15            # save register to be further manipulated
   
   lis r26, 0x43          # C
@@ -74,7 +73,7 @@
   ori r30, r30, 0x44     # D
   lis r31, 0x53          # S
 
-  stmw r21, 0xecb (r16)
+  stmw r21, 0xeca (r16)
 
   lmw r14, 0x8 (sp)      # pop r14-r31 off the stack pointer
   addi sp, sp, 0x0050    # release the space
