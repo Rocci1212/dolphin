@@ -5,6 +5,40 @@
   cmpw r0, r31          # Compare with r31
   bne- FINALLY          # Go to end of function
 
+########### PUSH r14-r31 INTO THE STACK
+  stwu sp, -0x0050 (sp) # make space for 18 registers
+  stmw r14, 0x8 (sp)    # push r14-r31 onto the stack pointer
+
+  lis r14, 0x80c5
+  ori r14, r14, 0xf340
+  lbz r14, 0 (r14)
+  cmpwi r14, 0
+  lis r14, 0x80c5
+  beq OFFLINE
+
+ONLINE:
+  ori r14, r14, 0xf29b
+
+OFFLINE:
+  ori r14, r14, 0xf303
+
+CHECK_STADIUM_CHEAT:
+  lbz r15, 0 (r14)
+  cmpwi cr2, r15, 2
+  li r16, 0
+  bne cr2, POP_STACK
+  li r16, 1
+  li r15, 0
+  stb r15, 0 (r14)
+
+########### POP r14-r31 FROM THE STACK
+POP_STACK:
+  cmpwi cr2, r16, 1
+  lmw r14, 0x8 (sp)     # pop r14-r31 off the stack pointer
+  addi sp, sp, 0x0050   # release the space
+  beq cr2, FINALLY
+
+SET_FIELD_PARAMS:
   # set speed
   lis r0, 0x3F26       
   ori r0, r0, 0x6666    # Load 3F266666 into r0 - this value equates to .65 in float
