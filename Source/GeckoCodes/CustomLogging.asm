@@ -26,14 +26,25 @@
   lis r3, 0x8060 # set r3 to custom text
   lis r4, 0x8057
   lwz r4, 0xffffd2d0 (r4) # set r4 to the frame #
-  lis r10, 0x806d
-  ori r10, r10, 0xf7a0
-  lwz r5, 0x218 (r10)
-  lwz r6, 0x21c (r10)
-  lwz r7, 0x220 (r10)
-  lwz r8, 0x268 (r10)
-  lwz r9, 0x26c (r10)
-  lwz r10, 0x270 (r10)
+
+  lis r10, 0x8058
+  ori r10, r10, 0x5e00
+  lhz r5, 0xe2 (r10)
+  lhz r6, 0xdc (r10)
+  lis r10, 0x805d
+  ori r10, r10, 0x6800
+  lbz r7, 0xdd (r10)
+  lbz r8, 0xe1 (r10)
+
+  # Ball XYZ values, kind of scuffed
+  #lis r10, 0x806d
+  #ori r10, r10, 0xf7a0
+  #lwz r5, 0x218 (r10)
+  #lwz r6, 0x21c (r10)
+  #lwz r7, 0x220 (r10)
+  #lwz r8, 0x268 (r10)
+  #lwz r9, 0x26c (r10)
+  #lwz r10, 0x270 (r10)
 
   bctrl # branch and link to nlPrint
 
