@@ -10,14 +10,15 @@
   stmw r14, 0x8 (sp)    # push r14-r31 onto the stack pointer
 
   lis r14, 0x80c5
-  ori r14, r14, 0xf340
-  lbz r14, 0 (r14)
-  cmpwi r14, 0
+  ori r14, r14, 0xf340  
+  lbz r14, 0 (r14)      # load in flag for if online
+  cmpwi r14, 0          # 0 = offline, 1 = online
   lis r14, 0x80c5
   beq OFFLINE
 
 ONLINE:
   ori r14, r14, 0xf29b
+  b CHECK_STADIUM_CHEAT
 
 OFFLINE:
   ori r14, r14, 0xf303
@@ -31,7 +32,6 @@ CHECK_STADIUM_CHEAT:
   li r15, 0
   stb r15, 0 (r14)
 
-########### POP r14-r31 FROM THE STACK
 POP_STACK:
   cmpwi cr2, r16, 1
   lmw r14, 0x8 (sp)     # pop r14-r31 off the stack pointer
