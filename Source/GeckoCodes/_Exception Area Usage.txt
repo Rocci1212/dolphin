@@ -2,3 +2,5 @@
 800002FE - 800002FE = Sidekick Possession Flag
 800002FD - 800002FD = Player Cheat
 800002F8 - 800002FB = Is CRC Out of Sync (opportunity for space here, it's 1 if so / 0 if not)
+800002FA - 800002FA = Is Wiimote Shaking
+800002F9 = 800002F9 = Is Nunchuk Shaking

@@ -10,8 +10,10 @@
   </PropertyGroup>
   <ItemGroup>
     <Content Include="$(MSBuildThisFileDirectory)Log Game Status.asm" />
+    <Content Include="$(MSBuildThisFileDirectory)NOTES FOR LOGGING BUTTON INPUTS.txt" />
     <Content Include="$(MSBuildThisFileDirectory)_Exception Area Usage.txt" />
     <Content Include="$(MSBuildThisFileDirectory)Flag Sidekick Possession.asm" />
+    <Content Include="$(MSBuildThisFileDirectory)_NOTES FOR CSL STADIA.txt" />
   </ItemGroup>
   <ItemGroup>
     <None Include="$(MSBuildThisFileDirectory)Add Version To Main Menu.asm" />
@@ -24,9 +26,12 @@
     <None Include="$(MSBuildThisFileDirectory)Blue Peach - Fix Stadium Banners.asm" />
     <None Include="$(MSBuildThisFileDirectory)Blue Peach - Fix Stadium Crowd.asm" />
     <None Include="$(MSBuildThisFileDirectory)Blue Peach.asm" />
+    <None Include="$(MSBuildThisFileDirectory)ButtonDisplay.asm" />
     <None Include="$(MSBuildThisFileDirectory)CPU v CPU.asm" />
+    <None Include="$(MSBuildThisFileDirectory)CustomLogging.asm" />
     <None Include="$(MSBuildThisFileDirectory)Default Competitive Rules and Camera Settings on Vs Mode Menu.asm" />
     <None Include="$(MSBuildThisFileDirectory)Default Competitive Rules and Camera Settings on Wiimmfi Menu.asm" />
+    <None Include="$(MSBuildThisFileDirectory)IsWiimoteShaking.asm" />
     <None Include="$(MSBuildThisFileDirectory)Mark Connections Lost.asm" />
     <None Include="$(MSBuildThisFileDirectory)Mark Random Seed Desyncs.asm" />
     <None Include="$(MSBuildThisFileDirectory)Display Score and Items in Menu.asm" />

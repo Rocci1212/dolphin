@@ -1,0 +1,4 @@
+The first thing I have to analyze is when the All Fast Stadia code gets called,
+in comparison to the Flag Game Status one. At some point, I need to switch the
+Stadium Cheat from 2 to 0. Hopefully I can do that in the Fast Stadia cheat,
+while skipping the Fast Stadia logic.
