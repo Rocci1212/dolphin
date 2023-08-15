@@ -32,7 +32,7 @@ void HLE_LogFPrint(ParameterType parameter_type);
 bool ignoreWPADsampling = true;
 bool ignoreRpcController = true;
 bool ignoreGameEvents = true;
-bool ignoreSoundEvents = true;
+bool ignoreSoundEvents = true; 
 
 void HLE_OSPanic()
 {
@@ -99,7 +99,7 @@ void HLE_GeneralDebugPrint(ParameterType parameter_type)
         return;
   }
 
-  NOTICE_LOG_FMT(OSREPORT_HLE, "{:08x}->{:08x}| {}", LR, PC, SHIFTJISToUTF8(report_message));
+  NOTICE_LOG_FMT(OSREPORT_HLE, "{:08x}->{:08x}| {}", LR, PC, report_msg);
 }
 
 // Generalized function for printing formatted string using parameter list.

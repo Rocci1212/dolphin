@@ -1,0 +1,21 @@
+A
+B
+Down
+Shake WiiMote
+Nunchuk Stick Info (X/Y, floats)
+C
+Z
+Shake Nunchuk
+
+80585ee2:
+0CZ0 0AB0 0000 0D00
+
+Goal of this:
+And 0AB0 with 0110, then shift 1 left
+And 0CZ0 with 0110, then add to AB00
+
+Maybe for now, just write half word at 80585ee2 in binary to get button inputs
+Plus:
+Halfword at 80585edc for joystick input
+
+80685ee2 and 80585ee4

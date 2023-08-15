@@ -34,13 +34,13 @@ STORE_PLAYER_CHEAT:
 GAME_END:
   cmpwi cr2, r6, 0x12   # Check if GameEndSuddenDeath is being called
   bne+ cr2, IDLE_START  # If not, go to next check
-  li r4, 0x0       	    # Load 0 into r4
+  lis r4, 0x80c5       	# Load 0 into r4
   stb r4, 0x2FF (r28)  	# Store 0 into 0x800002FF
-  ori r4, r4, 0xf29f    
-  lbz r27, 0 (r4)        # load value in the player cheats (online) into memory
-  cmpwi r27, 2           # check if safe megas selected - if so, reset back to 0
+  ori r4, r4, 0xf29f
+  lbz r5, 0 (r4)        # load value in the player cheats (online) into memory
+  cmpwi r5, 2           # check if safe megas selected - if so, reset back to 0
   bne FINALLY
-  stb r27, 0 (r4)      
+  stb r5, 0 (r4)
   b FINALLY        	    # Go to original instruction
 
 IDLE_START:

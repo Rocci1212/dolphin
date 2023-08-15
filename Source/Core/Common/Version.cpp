@@ -10,9 +10,9 @@
 namespace Common
 {
 #ifdef _DEBUG
-#define BUILD_TYPE_STR "Debug "
+#define BUILD_TYPE_STR "Debug " 
 #elif defined DEBUGFAST
-#define BUILD_TYPE_STR "DebugFast "
+#define BUILD_TYPE_STR "DebugFast " 
 #else
 #define BUILD_TYPE_STR ""
 #endif
