@@ -30,12 +30,12 @@
 
   lis r10, 0x8058
   ori r10, r10, 0x5e00
-  lhz r5, 0xe2 (r10)
-  lhz r6, 0xdc (r10)
-  lis r10, 0x805d
-  ori r10, r10, 0x6800
-  lbz r7, 0xdd (r10)
-  lbz r8, 0xe1 (r10)
+  lhz r5, 0xe2 (r10)      # set r5 to the face buttons: 0CZ0AB00 00000D00
+  lwz r6, 0x94 (r10)      # set r6 to the stick intensity
+  lwz r7, 0x140 (r10)     # set r7 to the stick X
+  lwz r8, 0x144 (r10)     # set r8 to the stick Y
+  lwz r9, 0xfc (r10)      # set r9 to the wiimote rumble
+  lwz r10, 0x158 (r10)    # set r10 to the nunchuk rumble
 
   # Ball XYZ values, kind of scuffed
   #lis r10, 0x806d
@@ -66,4 +66,3 @@ CLEAN_UP:
 
 FINALLY:
   sth	r0, 0x0088 (r3) # original instruction at 80330940
-
