@@ -1,10 +1,19 @@
 #To be inserted at 80330940
 # Used at [$Beta: Custom Logging] at R4QP01.ini
-  # push and pop the stack
 
+  # right now this only supports 4 loops, but can do up to 8
+  # the first 4 times it runs, r28 is 0-3
+  # the next 4 times, r19 is 0-3 while r28 is various mem addresses
+  cmpwi cr3, r28, 3
+  bgt cr3, FINALLY # escape if we're looking at a mem address
+
+  # figure out which loop i'm running
   cmpwi r28, 0
-  bne FINALLY
+  cmpwi cr1, r28, 1
+  cmpwi cr2, r28, 2
 
+SET_THE_TABLE:
+  # push and pop the stack
   stwu sp, -0x0050 (sp) #make space for 18 registers
   stmw r14, 0x8 (sp) #push r14-r31 onto the stack pointer
 
@@ -23,6 +32,10 @@
   ori r24, r24, 0x9b34 # set r24 to nlPrintf
   mtctr r24 # set count register to nlPrintf
 
+  beq LOOP_0
+  b cr1, LOOP_1
+
+LOOP_0: # frame # and player inputs
   # set data to custom text
   lis r3, 0x8060 # set r3 to custom text
   lis r4, 0x8057
@@ -37,17 +50,27 @@
   lwz r9, 0xfc (r10)      # set r9 to the wiimote rumble
   lwz r10, 0x158 (r10)    # set r10 to the nunchuk rumble
 
-  # Ball XYZ values, kind of scuffed
-  #lis r10, 0x806d
-  #ori r10, r10, 0xf7a0
-  #lwz r5, 0x218 (r10)
-  #lwz r6, 0x21c (r10)
-  #lwz r7, 0x220 (r10)
-  #lwz r8, 0x268 (r10)
-  #lwz r9, 0x26c (r10)
-  #lwz r10, 0x270 (r10)
+  bctrl # branch and link to nlPrint
+  b CLEAN_UP
+
+LOOP_1: #Ball XYZ values
+  # set data to custom text
+  lis r3, 0x8060 # set r3 to custom text
+  lis r4, 0x8057
+  lwz r4, 0xffffd2d0 (r4) # set r4 to the frame #
+
+  lis r10, 0x806d
+  ori r10, r10, 0xf7a0    # 806df7a0 is a pointer to the ball object
+  lwz r10, 0 (r10)        # load the object itself
+  lwz r5, 0x218 (r10)     # loose ball X location
+  lwz r6, 0x21c (r10)     # loose ball Y location
+  lwz r7, 0x220 (r10)     # loose ball Z location
+  lwz r8, 0x268 (r10)     # loose ball X velocity
+  lwz r9, 0x26c (r10)     # loose ball Y velocity
+  lwz r10, 0x270 (r10)    # loose ball Z velocity
 
   bctrl # branch and link to nlPrint
+  b CLEAN_UP
 
 CLEAN_UP:
   mr r3, r16 # restore r3
