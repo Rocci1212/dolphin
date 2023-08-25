@@ -19,9 +19,9 @@
   mr r22, r9 # backup r9
   mr r23, r10 #backup r10
 
-  lis r16, 0x8000 
-  ori r16, r16, 0x9b34 # set r16 to nlPrintf
-  mtctr r16 # set count register to nlPrintf
+  lis r24, 0x8000 
+  ori r24, r24, 0x9b34 # set r24 to nlPrintf
+  mtctr r24 # set count register to nlPrintf
 
   # set data to custom text
   lis r3, 0x8060 # set r3 to custom text
