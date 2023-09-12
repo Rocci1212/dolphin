@@ -41,7 +41,7 @@ SET_THE_TABLE:
   beq cr2, LOOP_2
   beq cr3, LOOP_3
 
-LOOP_0: # frame # and player inputs
+LOOP_2: # frame # and player inputs
   # set data to custom text
 
   lis r10, 0x8058
@@ -53,15 +53,12 @@ LOOP_0: # frame # and player inputs
   lwz r9, 0xfc (r10)      # set r9 to the wiimote rumble
   lwz r10, 0x158 (r10)    # set r10 to the nunchuk rumble
 
-  bctrl # branch and link to nlPrint
+  #bctrl # branch and link to nlPrint
   b CLEAN_UP
 
 LOOP_1: #Ball XYZ values
   # set data to custom text
   ori r3, r3, 0x20
-
-  li r4, 0
-  ori r4, r4, 0xba11
 
   lis r10, 0x806d
   ori r10, r10, 0xf7a0    # 806df7a0 is a pointer to the ball object
@@ -73,14 +70,18 @@ LOOP_1: #Ball XYZ values
   lwz r9, 0x26c (r10)     # loose ball Y velocity
   lwz r10, 0x270 (r10)    # loose ball Z velocity
 
-  bctrl # branch and link to nlPrint
+  #bctrl # branch and link to nlPrint
   b CLEAN_UP
 
-LOOP_2: # Random Seeds
+LOOP_0: # Random Seeds
   # set data to custom text
+  ori r3, r3, 0x40
 
+  lis r10, 0x80c4
+  lwz r5, 0x1f1c (r10)
+  lwz r6, 0x1f20 (r10)
 
-  #bctrl # branch and link to nlPrint
+  bctrl # branch and link to nlPrint
   b CLEAN_UP
 
 
