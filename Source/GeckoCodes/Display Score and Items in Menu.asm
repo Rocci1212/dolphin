@@ -3,7 +3,9 @@
 BEGIN:
   lis r30, 0x8000
   lbz r30, 0x2ff (r30)
-  andi r30, r30, 2
+
+# load game status,so the game knows if it needs to show custom text
+  andi. r30, r30, 2
   cmpwi cr4, r30, 2
 
 ########### PUSH r14-r31 INTO THE STACK
@@ -24,47 +26,65 @@ BEGIN:
   lwz r15, 0 (r15)      # grab it's value since it's a pointer to a pointer
   lis r16, 0x1          
   ori r16, r16, 0xFDEC
-  add r16, r15, r16     # offset it by 1d0ca (location of SEASON TIME text)
+  add r16, r15, r16     # offset it by 0x1fdec (location of "SAFE MEGASTRIKES" text)
 
-##### CHEAT TEXT ######
+##### RESTORE STATUS - CHEAT TEXT ######
   bl BRANCH_LINK_1
   .long 0x52455354 		# REST
-  .long 0x4F524520 		# ORE 
-  .long 0x53544154 		# STAT
-  .long 0x55530054 		# US(null)T
-  .long 0x4F20484F 		# O HO
-  .long 0x57204954 		# W IT	
-  .long 0x20574153 		# WAS
-  .long 0x20424546 		# BEF
-  .long 0x4F524520 		# ORE
-  .long 0x44495343 		# DISC
-  .long 0x4F4E4E45 		# ONNE
-  .long 0x4354494E 		# CTIN
-  .long 0x47000000		# G(null)
+  .long 0x4F524500 		# ORE(null)
+  .long 0x52455355 		# RESU
+  .long 0x4D45204D 		# ME M	
+  .long 0x41544348 		# ATCH
+  .long 0x00000000		# (null)
 
 BRANCH_LINK_1:
   mflr r17           
 
-SAFEMEGA_LOOP:
+RESTORESTATUS_LOOP:
   lbz r18, 0 (r17)   # load the next character from the branch link trick
   addi r17, r17, 1   # increment r17 by 1 to point to the next character of the branch link trick
   sth r18, 0 (r16)   # store a null followed by the character in the place you need to store it
-  addi r16, r16, 2   # increment r16 by 2 to point to the next character to write
-  cmpwi cr2, r18, 0  # check if last character was a null - if so, exit the loop
-  bne cr2, SAFEMEGA_LOOP  
+  addi r16, r16, 2   # increment r16 by 2 to point to the next address you need to write on
+  cmpwi cr2, r18, 0  # check if last character was a null. if so, exit the loop
+  bne cr2, RESTORESTATUS_LOOP  
 
-##### CHEAT SUB TEXT #####
+##### RESTORE STATUS - CHEAT SUB TEXT #####
   lis r16, 2
   ori r16, r16, 0xd2a8  # set r16 to it's new offset
   add r16, r15, r16     # set r16 to the offset + pointer to constants array
 
-ONLYKRITTER_LOOP:
+CHEAT_SUB_TEXT_LOOP:
   lbz r18, 0 (r17)      # load the next character from the branch link trick
   addi r17, r17, 1      # increment r17 by 1 to point to the next character of the branch link trick
   sth r18, 0 (r16)      # store a null followed by the character in the place you need to store it
-  addi r16, r16, 2      # increment r16 by 2 to point to the next character to write
-  cmpwi cr2, r18, 0     # check if last character was a null - if so, exit the loop
-  bne cr2, ONLYKRITTER_LOOP
+  addi r16, r16, 2      # increment r16 by 2 to point to the next address you need to write on
+  cmpwi cr2, r18, 0     # check if last character was a null. if so, exit the loop
+  bne cr2, CHEAT_SUB_TEXT_LOOP
+
+
+##### DEFENSIVE PRIORITY - CHEAT TEXT ######
+addi r16, r15, 0x7548 
+  bl BRANCH_LINK_2
+  .long 0x44454620 		# DEF
+  .long 0x5052494F 		# PRIO
+  .long 0x00000000		# (null)
+
+BRANCH_LINK_2:
+mflr r17
+
+DEFPRIO_LOOP:
+  lbz r18, 0 (r17)   # load the next character from the branch link trick
+  addi r17, r17, 1   # increment r17 by 1 to point to the next character of the branch link trick
+  sth r18, 0 (r16)   # store a null followed by the character in the place you need to store it
+  addi r16, r16, 2   # increment r16 by 2 to point to the next address you need to write on
+  cmpwi cr2, r18, 0  # check if last character was a null. if so, exit the loop
+  bne cr2, DEFPRIO_LOOP
+
+##### DEFENSIVE PRIORITY - CHEAT SUB TEXT ######
+  lis r16, 2
+  ori r16, r16, 0x555e  # set r16 to 0x2555e(location of "MORE POWER TO THE ELECTRIC FENCE" text)
+  add r16, r15, r16     # set r16 to the offset + pointer to constants array
+  sth r18, 0 (r16)   # store a null halfword to "delete" the cheat subtext
 
 SCORES:
   bne- cr4, END         # if it's not disconnected or connection lost, there's no need to restore
@@ -72,7 +92,7 @@ SCORES:
   lis r19, 0x8000       # point r19 to exception area where game status variables are kept
   lis r16, 0x1          
   ori r16, r16, 0xd0ca
-  add r16, r15, r16     # offset it by 1d0ca (location of SEASON TIME text)
+  add r16, r15, r16     # offset it by 0x1d0ca (location of "SEASON TIME2 text)
 
   # write home score
   lbz r18, 0x1cc (r19)
@@ -92,7 +112,7 @@ SCORES:
   li r18, 0x20
   sth r18, 6 (r16)
 
-  bl BRANCH_LINK_2
+  bl BRANCH_LINK_3
   .long 0x4772656E			#Gren ID:0
   .long 0x52656420 			#Red  ID:1
   .long 0x5370696E 			#Spin ID:2
@@ -105,7 +125,7 @@ SCORES:
   .long 0x43617074 			#Capt
   .long 0x4E4F4E45			#NONE
 
-BRANCH_LINK_2:
+BRANCH_LINK_3:
   addi r20, r19, 0x1b8  # r20 now points to 0x80000xb8: address of first home item qty
   li r21, 7			# r21 value = 7. r21 will be an important register to keep track if the loop's current state. r20+r21 will always point to the item ID
   li r23, 0
@@ -166,5 +186,3 @@ END:
   addi sp, sp, 0x0050   # release the space
 
   mr r30, r3            # original instruction at 8023B1EC
-
-
