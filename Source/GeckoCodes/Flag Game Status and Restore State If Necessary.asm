@@ -62,13 +62,13 @@ RESTORE_MATCH_STATUS:
   lwz r23, 0 (r23)      # load value from it's address into it
 
   lis r27, 0x80c6
-  lbz r26, 0xf29f (r27) # load 80c5f29f (location of player cheat) into r26
-  lbz r28, 0xf29b (r27) # load 80c5f29b (location of stadium cheat) into r28
+  lbz r26, 0xfffff29f (r27) # load 80c5f29f (location of player cheat) into r26
+  lbz r28, 0xfffff29b (r27) # load 80c5f29b (location of stadium cheat) into r28
 
   lis r22, 0x8000       # load 80000000 into r22 - we'll be able to access feder's game backup from there
 
   cmpwi r26, 2           # compare with 2 (safe megas - this will be the restore match status cheat)
-  bne END_RESTORE_MATCH_STATUS
+  bne REMOVE_HAZARDS_FROM_DEF_PRIO
 
 LOAD_THE_BACKUP:
   lbz r24, 0x1cc (r22)    # load current home score
@@ -97,11 +97,11 @@ RESTORE_THE_BACKUP:
   stb r21, 0xc07 (r23)				# away item 2 quantity
 
 REMOVE_HAZARDS_FROM_DEF_PRIO:
-  cmpwi r28, 0x3        # check if stadium cheat is 3 (defensive priority)
-  li r28, 0             # wipe r28
+  cmpwi r28, 0x3                # check if stadium cheat is 3 (defensive priority)
+  li r28, 0                     # wipe r28
   bne END_RESTORE_MATCH_STATUS  # go to end of function if not defensive priority
-  li r28, 1             # set r28 to 1 (secure stadia)
-  stb r28, 0xf29b (r27) # set secure stadia to stadium cheat
+  li r28, 1                     # set r28 to 1 (secure stadia)
+  stb r28, 0xfffff29b (r27)     # set secure stadia to stadium cheat
 
 END_RESTORE_MATCH_STATUS:
   stb r28, 0x1ff (r22)  # store stadium cheat to feder's game backup
