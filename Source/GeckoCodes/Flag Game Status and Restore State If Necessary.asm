@@ -40,7 +40,9 @@ GAME_END:
   lbz r5, 0 (r4)        # load value in the player cheats (online) into memory
   cmpwi r5, 2           # check if safe megas selected - if so, reset back to 0
   bne FINALLY
+  li r5, 0
   stb r5, 0 (r4)
+  stb r5, 0x90 (r4)
   b FINALLY        	    # Go to original instruction
 
 IDLE_START:
