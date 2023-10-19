@@ -9,41 +9,45 @@
     <Import_RootNamespace>GeckoCodes</Import_RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <Content Include="$(MSBuildThisFileDirectory)Log Game Status.asm" />
     <Content Include="$(MSBuildThisFileDirectory)NOTES FOR LOGGING BUTTON INPUTS.txt" />
     <Content Include="$(MSBuildThisFileDirectory)_Exception Area Usage.txt" />
-    <Content Include="$(MSBuildThisFileDirectory)Flag Sidekick Possession.asm" />
     <Content Include="$(MSBuildThisFileDirectory)_NOTES FOR CSL STADIA.txt" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="$(MSBuildThisFileDirectory)Add Version To Main Menu.asm" />
-    <None Include="$(MSBuildThisFileDirectory)All Fast Stadiums.asm" />
+    <None Include="$(MSBuildThisFileDirectory)01. Required - Text Updates\Add Version To Main Menu.asm" />
+    <None Include="$(MSBuildThisFileDirectory)01. Required - Text Updates\Force English.gcode" />
+    <None Include="$(MSBuildThisFileDirectory)02. Required - Enable Crossplay\Mark and Skip CRC Desyncs.asm" />
+    <None Include="$(MSBuildThisFileDirectory)03. Required - Unlock All Stadiums, Captains, and Cheats\Unlock All Challenges for Cheats.asm" />
+    <None Include="$(MSBuildThisFileDirectory)03. Required - Unlock All Stadiums, Captains, and Cheats\Unlock All Stadiums and Captains.asm" />
+    <None Include="$(MSBuildThisFileDirectory)04. Restore Game and Optional Defensive Aerial Priority\Conditional Defensive Aerial Priority.gcode" />
+    <None Include="$(MSBuildThisFileDirectory)04. Restore Game and Optional Defensive Aerial Priority\Display Score and Items in Menu.asm" />
+    <None Include="$(MSBuildThisFileDirectory)04. Restore Game and Optional Defensive Aerial Priority\Flag Game Status and Restore State If Necessary.asm" />
+    <None Include="$(MSBuildThisFileDirectory)04. Restore Game and Optional Defensive Aerial Priority\Log Game Status.asm" />
+    <None Include="$(MSBuildThisFileDirectory)04. Restore Game and Optional Defensive Aerial Priority\Mark Connections Lost.asm" />
+    <None Include="$(MSBuildThisFileDirectory)04. Restore Game and Optional Defensive Aerial Priority\Mark Random Seed Desyncs.asm" />
+    <None Include="$(MSBuildThisFileDirectory)05. Required - Fast Stadia\All Fast Stadiums.asm" />
+    <None Include="$(MSBuildThisFileDirectory)05. Required - Fast Stadia\Emulator Only\Remove Fog.gcode" />
+    <None Include="$(MSBuildThisFileDirectory)06. Recommended - Default Competitive Rules and Camera Settings\Default Competitive Rules and Camera Settings on Vs Mode Menu.asm" />
+    <None Include="$(MSBuildThisFileDirectory)06. Recommended - Default Competitive Rules and Camera Settings\Default Competitive Rules and Camera Settings on Wiimmfi Menu.asm" />
+    <None Include="$(MSBuildThisFileDirectory)07. Recommended - Skip Match Intros\SkipOpening.asm" />
+    <None Include="$(MSBuildThisFileDirectory)08. Recommended - No Megastrikes in Match Play\Flag Sidekick Possession.asm" />
+    <None Include="$(MSBuildThisFileDirectory)08. Recommended - No Megastrikes in Match Play\No Megas.asm" />
+    <None Include="$(MSBuildThisFileDirectory)09. Recommended - Blue Peach\Blue Peach - Fix Kritter Gloves.asm" />
+    <None Include="$(MSBuildThisFileDirectory)09. Recommended - Blue Peach\Blue Peach - Fix Sidekick Menu Crash.asm" />
+    <None Include="$(MSBuildThisFileDirectory)09. Recommended - Blue Peach\Blue Peach - Fix Stadium Banners 2.asm" />
+    <None Include="$(MSBuildThisFileDirectory)09. Recommended - Blue Peach\Blue Peach - Fix Stadium Banners.asm" />
+    <None Include="$(MSBuildThisFileDirectory)09. Recommended - Blue Peach\Blue Peach - Fix Stadium Crowd.asm" />
+    <None Include="$(MSBuildThisFileDirectory)09. Recommended - Blue Peach\Character Priorities.gcode" />
+    <None Include="$(MSBuildThisFileDirectory)10. Alpha - Game Point Sudden Death\Game Point Sudden Death.asm" />
+    <None Include="$(MSBuildThisFileDirectory)11. Optional - CPU vs CPU\CPU v CPU.asm" />
     <None Include="$(MSBuildThisFileDirectory)Better Training Mode Part 1.asm" />
     <None Include="$(MSBuildThisFileDirectory)Better Training Mode Part 2.asm" />
-    <None Include="$(MSBuildThisFileDirectory)Blue Peach - Fix Kritter Gloves.asm" />
-    <None Include="$(MSBuildThisFileDirectory)Blue Peach - Fix Sidekick Menu Crash.asm" />
-    <None Include="$(MSBuildThisFileDirectory)Blue Peach - Fix Stadium Banners 2.asm" />
-    <None Include="$(MSBuildThisFileDirectory)Blue Peach - Fix Stadium Banners.asm" />
-    <None Include="$(MSBuildThisFileDirectory)Blue Peach - Fix Stadium Crowd.asm" />
     <None Include="$(MSBuildThisFileDirectory)Blue Peach.asm" />
     <None Include="$(MSBuildThisFileDirectory)ButtonDisplay.asm" />
-    <None Include="$(MSBuildThisFileDirectory)CPU v CPU.asm" />
     <None Include="$(MSBuildThisFileDirectory)CustomLogging.asm" />
-    <None Include="$(MSBuildThisFileDirectory)Default Competitive Rules and Camera Settings on Vs Mode Menu.asm" />
-    <None Include="$(MSBuildThisFileDirectory)Default Competitive Rules and Camera Settings on Wiimmfi Menu.asm" />
     <None Include="$(MSBuildThisFileDirectory)IsWiimoteShaking.asm" />
-    <None Include="$(MSBuildThisFileDirectory)Mark Connections Lost.asm" />
-    <None Include="$(MSBuildThisFileDirectory)Mark Random Seed Desyncs.asm" />
-    <None Include="$(MSBuildThisFileDirectory)Display Score and Items in Menu.asm" />
     <None Include="$(MSBuildThisFileDirectory)Fix Random Seed Desyncs - Console.asm" />
     <None Include="$(MSBuildThisFileDirectory)Fix Random Seed Desyncs - Dolphin.asm" />
     <None Include="$(MSBuildThisFileDirectory)Flag On Game Quit.asm" />
-    <None Include="$(MSBuildThisFileDirectory)Flag Game Status and Restore State If Necessary.asm" />
-    <None Include="$(MSBuildThisFileDirectory)Game Point Sudden Death.asm" />
-    <None Include="$(MSBuildThisFileDirectory)Mark and Skip CRC Desyncs.asm" />
-    <None Include="$(MSBuildThisFileDirectory)No Megas.asm" />
-    <None Include="$(MSBuildThisFileDirectory)SkipOpening.asm" />
-    <None Include="$(MSBuildThisFileDirectory)Unlock All Challenges for Cheats.asm" />
-    <None Include="$(MSBuildThisFileDirectory)Unlock All Stadiums and Captains.asm" />
   </ItemGroup>
 </Project>
