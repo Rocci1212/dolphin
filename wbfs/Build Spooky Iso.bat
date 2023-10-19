@@ -12,7 +12,7 @@ echo files/ini/Stadiums/craterfield.ini - made brighter
 echo files/ini/Stadiums/pipelinecentral.ini - fog removed
 echo files/ini/Stadiums/stormship.ini - fog removed
 echo files/ini/Stadiums/wastelands.ini - fog removed, lighting fixes
-echo files/ini/StrikerChallenges/tutorial6.ini - extended to 10 mins, replaced monty with hammer bro
+echo files/ini/StrikerChallenges/tutorial6.ini - extended to 10 mins, removed all opposing sidekicks
 cp DATA source -r
 echo Done!
 echo Patching main.dol with gecko codes...
@@ -23,6 +23,6 @@ del R4QP01.gct
 cd ../../..
 echo Done!
 echo Building iso and cleaning up...
-wit copy source R4QP03.wbfs --id R4QP03 --name "Spooky MSC 0.4.4"
+wit copy source R4QP03.wbfs --id R4QP03 --name "Spooky MSC 0.4.5"
 rmdir /s /q source
 pause
