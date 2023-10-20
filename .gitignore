@@ -40,4 +40,5 @@ CMakeLists.txt.user
 # Ignore Visual Studio Code's working dir
 /.vscode/
 # Ignore custom build of MSC
-/wbfs/
+*.wbfs
+/wbfs/notes
