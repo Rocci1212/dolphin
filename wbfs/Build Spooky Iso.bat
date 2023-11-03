@@ -7,7 +7,7 @@ echo Done!
 echo Copying over DATA folder...
 echo Current contents of DATA folder:
 echo sys/main.dol - patched to force english
-echo files/Art/fe/ukenglish - text updates in here
+# echo files/Art/fe/ukenglish - text updates in here
 echo files/ini/Stadiums/craterfield.ini - made brighter
 echo files/ini/Stadiums/pipelinecentral.ini - fog removed
 echo files/ini/Stadiums/stormship.ini - fog removed
