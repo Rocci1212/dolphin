@@ -7,7 +7,7 @@ echo Done!
 echo Copying over DATA folder...
 echo Current contents of DATA folder:
 echo sys/main.dol - patched to force english
-# echo files/Art/fe/ukenglish - text updates in here
+:: echo files/Art/fe/ukenglish - text updates in here
 echo files/ini/Stadiums/craterfield.ini - made brighter
 echo files/ini/Stadiums/pipelinecentral.ini - fog removed
 echo files/ini/Stadiums/stormship.ini - fog removed
@@ -23,6 +23,6 @@ del R4QP01.gct
 cd ../../..
 echo Done!
 echo Building iso and cleaning up...
-wit copy source R4QP03.wbfs --id R4QP03 --name "Spooky MSC 0.4.5"
+wit copy source R4QP03.wbfs --id R4QP03 --name "Spooky MSC 0.4.6A"
 rmdir /s /q source
 pause
