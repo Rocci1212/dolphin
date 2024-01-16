@@ -43,7 +43,7 @@ BreakpointDialog::BreakpointDialog(BreakpointWidget* parent, const TBreakPoint* 
 
   m_instruction_address->setText(QString::number(breakpoint->address, 16));
   if (breakpoint->condition)
-    m_instruction_condition->setText(QString::fromStdString(breakpoint->condition->GetText()));
+    m_conditional->setText(QString::fromStdString(breakpoint->condition->GetText()));
 
   m_do_break->setChecked(breakpoint->break_on_hit && !breakpoint->log_on_hit);
   m_do_log->setChecked(!breakpoint->break_on_hit && breakpoint->log_on_hit);
@@ -73,6 +73,8 @@ BreakpointDialog::BreakpointDialog(BreakpointWidget* parent, const TMemCheck* me
   {
     m_memory_address_to->setText(QString::number(memcheck->start_address + 1, 16));
   }
+  if (memcheck->condition)
+    m_conditional->setText(QString::fromStdString(memcheck->condition->GetText()));
 
   m_memory_on_read->setChecked(memcheck->is_break_on_read && !memcheck->is_break_on_write);
   m_memory_on_write->setChecked(!memcheck->is_break_on_read && memcheck->is_break_on_write);
@@ -88,7 +90,8 @@ BreakpointDialog::BreakpointDialog(BreakpointWidget* parent, const TMemCheck* me
 
 void BreakpointDialog::CreateWidgets()
 {
-  m_buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel);
+  m_buttons = new QDialogButtonBox(QDialogButtonBox::Ok | QDialogButtonBox::Cancel |
+                                   QDialogButtonBox::Help);
   auto* type_group = new QButtonGroup(this);
 
   // Instruction BP
@@ -99,18 +102,13 @@ void BreakpointDialog::CreateWidgets()
   type_group->addButton(m_instruction_bp);
   m_instruction_box = new QGroupBox;
   m_instruction_address = new QLineEdit;
-  m_instruction_condition = new QLineEdit;
-  m_cond_help_btn = new QPushButton(tr("Help"));
 
-  auto* instruction_data_layout = new QGridLayout;
+  auto* instruction_data_layout = new QHBoxLayout;
   m_instruction_box->setLayout(instruction_data_layout);
-  instruction_data_layout->addWidget(new QLabel(tr("Address:")), 0, 0);
-  instruction_data_layout->addWidget(m_instruction_address, 0, 1);
-  instruction_data_layout->addWidget(new QLabel(tr("Condition:")), 1, 0);
-  instruction_data_layout->addWidget(m_instruction_condition, 1, 1);
+  instruction_data_layout->addWidget(new QLabel(tr("Address:")));
+  instruction_data_layout->addWidget(m_instruction_address);
 
   instruction_layout->addWidget(m_instruction_bp, 0, 0, 1, 1);
-  instruction_layout->addWidget(m_cond_help_btn, 0, 1, 1, 1);
   instruction_layout->addWidget(m_instruction_box, 1, 0, 1, 2);
   instruction_widget->setLayout(instruction_layout);
 
@@ -155,6 +153,9 @@ void BreakpointDialog::CreateWidgets()
   memory_data_layout->addWidget(m_memory_address_from, 1, 1);
   memory_data_layout->addWidget(m_memory_address_to_label, 1, 2);
   memory_data_layout->addWidget(m_memory_address_to, 1, 3);
+
+  // i18n: If a condition is set for a breakpoint, the condition becoming true is a prerequisite for
+  // triggering the breakpoint.
   QGroupBox* condition_box = new QGroupBox(tr("Condition"));
   auto* condition_layout = new QHBoxLayout;
   condition_box->setLayout(condition_layout);
@@ -169,11 +170,24 @@ void BreakpointDialog::CreateWidgets()
   memory_widget->setLayout(memory_layout);
 
   QGroupBox* action_box = new QGroupBox(tr("Action"));
+
+  QHBoxLayout* conditional_layout = new QHBoxLayout;
+  m_conditional = new QLineEdit();
+  // i18n: If a condition is set for a breakpoint, the condition becoming true is a prerequisite for
+  // triggering the breakpoint.
+  conditional_layout->addWidget(new QLabel(tr("Condition:")));
+  conditional_layout->addWidget(m_conditional);
+
   auto* action_layout = new QHBoxLayout;
-  action_box->setLayout(action_layout);
   action_layout->addWidget(m_do_log);
   action_layout->addWidget(m_do_break);
   action_layout->addWidget(m_do_log_and_break);
+
+  auto* action_vlayout = new QVBoxLayout;
+  action_vlayout->addLayout(conditional_layout);
+  action_vlayout->addLayout(action_layout);
+
+  action_box->setLayout(action_vlayout);
 
   auto* layout = new QVBoxLayout;
   layout->addWidget(instruction_widget);
@@ -195,7 +209,6 @@ void BreakpointDialog::CreateWidgets()
     break;
   case OpenMode::EditMemCheck:
     instruction_widget->setVisible(false);
-    m_cond_help_btn->setVisible(false);
     m_memory_bp->setChecked(true);
     m_memory_address_from->setEnabled(false);
     m_memory_address_to->setFocus();
@@ -209,8 +222,7 @@ void BreakpointDialog::ConnectWidgets()
 {
   connect(m_buttons, &QDialogButtonBox::accepted, this, &BreakpointDialog::accept);
   connect(m_buttons, &QDialogButtonBox::rejected, this, &BreakpointDialog::reject);
-
-  connect(m_cond_help_btn, &QPushButton::clicked, this, &BreakpointDialog::ShowConditionHelp);
+  connect(m_buttons, &QDialogButtonBox::helpRequested, this, &BreakpointDialog::ShowConditionHelp);
 
   connect(m_instruction_bp, &QRadioButton::toggled, this, &BreakpointDialog::OnBPTypeChanged);
   connect(m_memory_bp, &QRadioButton::toggled, this, &BreakpointDialog::OnBPTypeChanged);
@@ -239,7 +251,7 @@ void BreakpointDialog::OnAddressTypeChanged()
 
 void BreakpointDialog::accept()
 {
-  auto invalid_input = [this](QString field) {
+  auto invalid_input = [this](const QString& field) {
     ModalMessageBox::critical(this, tr("Error"),
                               tr("Invalid input for the field \"%1\"").arg(field));
   };
@@ -257,6 +269,16 @@ void BreakpointDialog::accept()
 
   bool good;
 
+  const QString condition = m_conditional->text().trimmed();
+
+  if (!condition.isEmpty() && !Expression::TryParse(condition.toUtf8().constData()))
+  {
+    // i18n: If a condition is set for a breakpoint, the condition becoming true is a prerequisite
+    // for triggering the breakpoint.
+    invalid_input(tr("Condition"));
+    return;
+  }
+
   if (instruction)
   {
     u32 address = m_instruction_address->text().toUInt(&good, 16);
@@ -264,14 +286,6 @@ void BreakpointDialog::accept()
     if (!good)
     {
       invalid_input(tr("Address"));
-      return;
-    }
-
-    const QString condition = m_instruction_condition->text().trimmed();
-
-    if (!condition.isEmpty() && !Expression::TryParse(condition.toUtf8().constData()))
-    {
-      invalid_input(tr("Condition"));
       return;
     }
 
@@ -296,11 +310,11 @@ void BreakpointDialog::accept()
         return;
       }
 
-      m_parent->AddRangedMBP(from, to, on_read, on_write, do_log, do_break);
+      m_parent->AddRangedMBP(from, to, on_read, on_write, do_log, do_break, condition);
     }
     else
     {
-      m_parent->AddAddressMBP(from, on_read, on_write, do_log, do_break);
+      m_parent->AddAddressMBP(from, on_read, on_write, do_log, do_break, condition);
     }
   }
 
@@ -309,9 +323,7 @@ void BreakpointDialog::accept()
 
 void BreakpointDialog::ShowConditionHelp()
 {
-  const auto message = QStringLiteral(
-      "Set a code breakpoint for when an instruction is executed. Use with the code widget.\n"
-      "\n"
+  const auto message = tr(
       "Conditions:\n"
       "Sets an expression that is evaluated when a breakpoint is hit. If the expression is false "
       "or 0, the breakpoint is ignored until hit again. Statements should be separated by a comma. "
@@ -325,6 +337,7 @@ void BreakpointDialog::ShowConditionHelp()
       "Set a register: r1 = 8\n"
       "Casts: s8(0xff). Available: s8, u8, s16, u16, s32, u32\n"
       "Callstack: callstack(0x80123456), callstack(\"anim\")\n"
+      "Compare Strings: streq(r3, \"abc\"). Both parameters can be addresses or string constants.\n"
       "Read Memory: read_u32(0x80000000). Available: u8, s8, u16, s16, u32, s32, f32, f64\n"
       "Write Memory: write_u32(r3, 0x80000000). Available: u8, u16, u32, f32, f64\n"
       "*currently writing will always be triggered\n"
@@ -343,12 +356,14 @@ void BreakpointDialog::ShowConditionHelp()
       "Write and break: r4 = 8, 1\n"
       "Write and continue: f3 = f1 + f2, 0\n"
       "The condition must always be last\n\n"
-      "Strings should only be used in callstack() and \"quoted\". Do not assign strings to a "
-      "variable.\n"
+      "Strings should only be used in callstack() or streq() and \"quoted\". Do not assign strings "
+      "to a variable.\n"
       "All variables will be printed in the Memory Interface log, if there's a hit or a NaN "
       "result. To check for issues, assign a variable to your equation, so it can be printed.\n\n"
       "Note: All values are internally converted to Doubles for calculations. It's possible for "
       "them to go out of range or to become NaN. A warning will be given if NaN is returned, and "
       "the var that became NaN will be logged.");
+  // i18n: The title for a dialog that shows help for how to use conditions. If a condition is set
+  // for a breakpoint, the condition becoming true is a prerequisite for triggering the breakpoint.
   ModalMessageBox::information(this, tr("Conditional help"), message);
 }

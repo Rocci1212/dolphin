@@ -18,6 +18,7 @@
 #include "DiscIO/Filesystem.h"
 #include "DiscIO/Volume.h"
 
+#include "Core/System.h"
 #include "Core/PowerPC/PowerPC.h"
 
 namespace FileMonitor
@@ -79,9 +80,12 @@ void FileLogger::Log(const DiscIO::Volume& volume, const DiscIO::Partition& part
   if (m_previous_partition == partition && m_previous_file_offset == file_offset)
     return;
 
-  const std::string size_string = ThousandSeparate(file_info->GetSize() / 1000, 7);
+  auto& system = Core::System::GetInstance();
+  auto& ppc_state = system.GetPPCState();
+
+  const std::string size_string = Common::ThousandSeparate(file_info->GetSize() / 1000, 7);
   const std::string path = file_info->GetPath();
-  const std::string log_string = fmt::format("{:08x} {} kB {} | Offset: {}", PC, size_string, path, file_offset);
+  const std::string log_string = fmt::format("{:08x} {} kB {} | Offset: {}", ppc_state.pc, size_string, path, file_offset);
   if (IsSoundFile(path))
     INFO_LOG_FMT(FILEMON, "{}", log_string);
   else

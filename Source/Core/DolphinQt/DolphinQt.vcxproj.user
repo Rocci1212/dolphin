@@ -3,6 +3,6 @@
   <PropertyGroup>
     <LocalDebuggerCommand>$(BinaryOutputDir)$(TargetFileName)</LocalDebuggerCommand>
     <DebuggerFlavor>WindowsLocalDebugger</DebuggerFlavor>
-    <ShowAllFiles>false</ShowAllFiles>
+    <ShowAllFiles>true</ShowAllFiles>
   </PropertyGroup>
 </Project>

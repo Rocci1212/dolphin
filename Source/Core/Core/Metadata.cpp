@@ -8,6 +8,8 @@
 #include "Common/CommonPaths.h"
 #include "Common/FileUtil.h"
 #include <Core/StateAuxillary.h>
+#include "Core/IOS/IOS.h"
+#include "Core/System.h"
 
 static tm* matchDateTime;
 static int homeTeamPossesionFrameCount;
@@ -86,7 +88,7 @@ void Metadata::writeJSON(std::string jsonString, bool callBatch)
     strftime(date_string, 50, "%B_%d_%Y_%OH_%OM_%OS", matchDateTime);
     std::string someDate(date_string);
     std::string gameTime = "Game_" + someDate;
-    
+
     // WinExec(batchPath.c_str(), SW_HIDE);
     //  https://stackoverflow.com/questions/11370908/how-do-i-use-minizip-on-zlib
     std::vector<std::wstring> paths;
@@ -167,16 +169,20 @@ void Metadata::setMatchMetadata(tm* matchDateTimeParam)
   // have consistent time across the output file and the in-json time
   matchDateTime = matchDateTimeParam;
 
+  // this is the new way to get data in mem, completely untested
+  auto& system = Core::System::GetInstance();
+  auto& memory = system.GetMemory();
+
   // not working, not sure why
-  homeCaptainID = Memory::Read_U32(addressHomeCaptainID);
-  awayCaptainID = Memory::Read_U32(addressAwayCaptainID);
-  homeSidekickTopID = Memory::Read_U32(addressHomeSidekickTopID);
-  awaySidekickTopID = Memory::Read_U32(addressAwaySidekickTopID);
-  homeSidekickBackID = Memory::Read_U32(addressHomeSidekickBackID);
-  awaySidekickBackID = Memory::Read_U32(addressAwaySidekickBackID);
-  homeSidekickBottomID = Memory::Read_U32(addressHomeSidekickBottomID);
-  awaySidekickBottomID = Memory::Read_U32(addressAwaySidekickBottomID);
-  stadiumID = Memory::Read_U32(addressStadiumID);
+  homeCaptainID = memory.Read_U32(addressHomeCaptainID);
+  awayCaptainID = memory.Read_U32(addressAwayCaptainID);
+  homeSidekickTopID = memory.Read_U32(addressHomeSidekickTopID);
+  awaySidekickTopID = memory.Read_U32(addressAwaySidekickTopID);
+  homeSidekickBackID = memory.Read_U32(addressHomeSidekickBackID);
+  awaySidekickBackID = memory.Read_U32(addressAwaySidekickBackID);
+  homeSidekickBottomID = memory.Read_U32(addressHomeSidekickBottomID);
+  awaySidekickBottomID = memory.Read_U32(addressAwaySidekickBottomID);
+  stadiumID = memory.Read_U32(addressStadiumID);
 }
 
 void Metadata::setPlayerName(std::string playerNameParam)

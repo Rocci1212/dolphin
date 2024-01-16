@@ -4,7 +4,6 @@
 #pragma once
 
 #include <QToolBar>
-#include <qpushbutton.h>
 
 class QAction;
 

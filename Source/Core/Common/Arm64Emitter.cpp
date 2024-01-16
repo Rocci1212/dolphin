@@ -18,6 +18,7 @@
 #include "Common/BitUtils.h"
 #include "Common/CommonTypes.h"
 #include "Common/MathUtil.h"
+#include "Common/SmallVector.h"
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -1794,33 +1795,6 @@ void ARM64XEmitter::ADRP(ARM64Reg Rd, s64 imm)
   EncodeAddressInst(1, Rd, static_cast<s32>(imm >> 12));
 }
 
-template <typename T, size_t MaxSize>
-class SmallVector final
-{
-public:
-  SmallVector() = default;
-  explicit SmallVector(size_t size) : m_size(size) {}
-
-  void push_back(const T& x) { m_array[m_size++] = x; }
-  void push_back(T&& x) { m_array[m_size++] = std::move(x); }
-
-  template <typename... Args>
-  T& emplace_back(Args&&... args)
-  {
-    return m_array[m_size++] = T{std::forward<Args>(args)...};
-  }
-
-  T& operator[](size_t i) { return m_array[i]; }
-  const T& operator[](size_t i) const { return m_array[i]; }
-
-  size_t size() const { return m_size; }
-  bool empty() const { return m_size == 0; }
-
-private:
-  std::array<T, MaxSize> m_array{};
-  size_t m_size = 0;
-};
-
 template <typename T>
 void ARM64XEmitter::MOVI2RImpl(ARM64Reg Rd, T imm)
 {
@@ -1844,17 +1818,17 @@ void ARM64XEmitter::MOVI2RImpl(ARM64Reg Rd, T imm)
 
   constexpr size_t max_parts = sizeof(T) / 2;
 
-  SmallVector<Part, max_parts> best_parts;
+  Common::SmallVector<Part, max_parts> best_parts;
   Approach best_approach;
   u64 best_base;
 
-  const auto instructions_required = [](const SmallVector<Part, max_parts>& parts,
+  const auto instructions_required = [](const Common::SmallVector<Part, max_parts>& parts,
                                         Approach approach) {
     return parts.size() + (approach > Approach::MOVNBase);
   };
 
   const auto try_base = [&](T base, Approach approach, bool first_time) {
-    SmallVector<Part, max_parts> parts;
+    Common::SmallVector<Part, max_parts> parts;
 
     for (size_t i = 0; i < max_parts; ++i)
     {
@@ -2170,6 +2144,12 @@ void ARM64FloatEmitter::EmitCopy(bool Q, u32 op, u32 imm5, u32 imm4, ARM64Reg Rd
 void ARM64FloatEmitter::EmitScalar2RegMisc(bool U, u32 size, u32 opcode, ARM64Reg Rd, ARM64Reg Rn)
 {
   Write32((1 << 30) | (U << 29) | (0b11110001 << 21) | (size << 22) | (opcode << 12) | (1 << 11) |
+          (DecodeReg(Rn) << 5) | DecodeReg(Rd));
+}
+
+void ARM64FloatEmitter::EmitScalarPairwise(bool U, u32 size, u32 opcode, ARM64Reg Rd, ARM64Reg Rn)
+{
+  Write32((1 << 30) | (U << 29) | (0b111100011 << 20) | (size << 22) | (opcode << 12) | (1 << 11) |
           (DecodeReg(Rn) << 5) | DecodeReg(Rd));
 }
 
@@ -2985,6 +2965,28 @@ void ARM64FloatEmitter::FRSQRTE(ARM64Reg Rd, ARM64Reg Rn)
   EmitScalar2RegMisc(1, IsDouble(Rd) ? 3 : 2, 0x1D, Rd, Rn);
 }
 
+// Scalar - pairwise
+void ARM64FloatEmitter::FADDP(ARM64Reg Rd, ARM64Reg Rn)
+{
+  EmitScalarPairwise(1, IsDouble(Rd), 0b01101, Rd, Rn);
+}
+void ARM64FloatEmitter::FMAXP(ARM64Reg Rd, ARM64Reg Rn)
+{
+  EmitScalarPairwise(1, IsDouble(Rd), 0b01111, Rd, Rn);
+}
+void ARM64FloatEmitter::FMINP(ARM64Reg Rd, ARM64Reg Rn)
+{
+  EmitScalarPairwise(1, IsDouble(Rd) ? 3 : 2, 0b01111, Rd, Rn);
+}
+void ARM64FloatEmitter::FMAXNMP(ARM64Reg Rd, ARM64Reg Rn)
+{
+  EmitScalarPairwise(1, IsDouble(Rd), 0b01100, Rd, Rn);
+}
+void ARM64FloatEmitter::FMINNMP(ARM64Reg Rd, ARM64Reg Rn)
+{
+  EmitScalarPairwise(1, IsDouble(Rd) ? 3 : 2, 0b01100, Rd, Rn);
+}
+
 // Scalar - 2 Source
 void ARM64FloatEmitter::ADD(ARM64Reg Rd, ARM64Reg Rn, ARM64Reg Rm)
 {
@@ -3064,7 +3066,7 @@ void ARM64FloatEmitter::FMOV(ARM64Reg Rd, uint8_t imm8)
 // Vector
 void ARM64FloatEmitter::ADD(u8 size, ARM64Reg Rd, ARM64Reg Rn, ARM64Reg Rm)
 {
-  EmitThreeSame(0, IntLog2(size) - 3, 0b10000, Rd, Rn, Rm);
+  EmitThreeSame(0, MathUtil::IntLog2(size) - 3, 0b10000, Rd, Rn, Rm);
 }
 void ARM64FloatEmitter::AND(ARM64Reg Rd, ARM64Reg Rn, ARM64Reg Rm)
 {
@@ -3561,7 +3563,7 @@ void ARM64FloatEmitter::SHL(ARM64Reg Rd, ARM64Reg Rn, u32 shift)
 {
   constexpr size_t src_size = 64;
   ASSERT_MSG(DYNA_REC, IsDouble(Rd), "Only double registers are supported!");
-  ASSERT_MSG(DYNA_REC, shift < src_size, "Shift amount must less than the element size! {} {}",
+  ASSERT_MSG(DYNA_REC, shift < src_size, "Shift amount must be less than the element size! {} {}",
              shift, src_size);
   EmitScalarShiftImm(0, src_size | shift, 0b01010, Rd, Rn);
 }
@@ -3570,7 +3572,7 @@ void ARM64FloatEmitter::URSHR(ARM64Reg Rd, ARM64Reg Rn, u32 shift)
 {
   constexpr size_t src_size = 64;
   ASSERT_MSG(DYNA_REC, IsDouble(Rd), "Only double registers are supported!");
-  ASSERT_MSG(DYNA_REC, shift < src_size, "Shift amount must less than the element size! {} {}",
+  ASSERT_MSG(DYNA_REC, shift < src_size, "Shift amount must be less than the element size! {} {}",
              shift, src_size);
   EmitScalarShiftImm(1, src_size * 2 - shift, 0b00100, Rd, Rn);
 }
@@ -3619,7 +3621,7 @@ void ARM64FloatEmitter::UXTL2(u8 src_size, ARM64Reg Rd, ARM64Reg Rn)
 
 void ARM64FloatEmitter::SHL(u8 src_size, ARM64Reg Rd, ARM64Reg Rn, u32 shift)
 {
-  ASSERT_MSG(DYNA_REC, shift < src_size, "Shift amount must less than the element size! {} {}",
+  ASSERT_MSG(DYNA_REC, shift < src_size, "Shift amount must be less than the element size! {} {}",
              shift, src_size);
   EmitShiftImm(1, 0, src_size | shift, 0b01010, Rd, Rn);
 }
@@ -3633,7 +3635,7 @@ void ARM64FloatEmitter::SSHLL(u8 src_size, ARM64Reg Rd, ARM64Reg Rn, u32 shift, 
 
 void ARM64FloatEmitter::URSHR(u8 src_size, ARM64Reg Rd, ARM64Reg Rn, u32 shift)
 {
-  ASSERT_MSG(DYNA_REC, shift < src_size, "Shift amount must less than the element size! {} {}",
+  ASSERT_MSG(DYNA_REC, shift < src_size, "Shift amount must be less than the element size! {} {}",
              shift, src_size);
   EmitShiftImm(1, 1, src_size * 2 - shift, 0b00100, Rd, Rn);
 }
@@ -3649,7 +3651,7 @@ void ARM64FloatEmitter::SHRN(u8 dest_size, ARM64Reg Rd, ARM64Reg Rn, u32 shift, 
 {
   ASSERT_MSG(DYNA_REC, shift < dest_size, "Shift amount must be less than the element size! {} {}",
              shift, dest_size);
-  EmitShiftImm(upper, 1, dest_size | shift, 0b10000, Rd, Rn);
+  EmitShiftImm(upper, 1, dest_size * 2 - shift, 0b10000, Rd, Rn);
 }
 
 void ARM64FloatEmitter::SXTL(u8 src_size, ARM64Reg Rd, ARM64Reg Rn, bool upper)

@@ -23,6 +23,7 @@
 #include "Core/Core.h"
 #include "Core/HW/Memmap.h"
 #include "Core/PowerPC/MMU.h"
+#include "Core/System.h"
 #include "DolphinQt/QtUtils/ModalMessageBox.h"
 #include "DolphinQt/QtUtils/NonDefaultQPushButton.h"
 
@@ -122,6 +123,8 @@ void CheatSearchFactoryWidget::CreateWidgets()
   m_new_search = new NonDefaultQPushButton(tr("New Search"));
   layout->addWidget(m_new_search);
 
+  layout->addStretch();
+
   setLayout(layout);
 }
 
@@ -164,9 +167,11 @@ void CheatSearchFactoryWidget::OnNewSearchClicked()
       return;
     }
 
-    memory_ranges.emplace_back(0x80000000, Memory::GetRamSizeReal());
+    auto& system = Core::System::GetInstance();
+    auto& memory = system.GetMemory();
+    memory_ranges.emplace_back(0x80000000, memory.GetRamSizeReal());
     if (SConfig::GetInstance().bWii)
-      memory_ranges.emplace_back(0x90000000, Memory::GetExRamSizeReal());
+      memory_ranges.emplace_back(0x90000000, memory.GetExRamSizeReal());
     address_space = PowerPC::RequestedAddressSpace::Virtual;
   }
   else
