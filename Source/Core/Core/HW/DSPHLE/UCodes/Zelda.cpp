@@ -11,11 +11,13 @@
 #include "Common/CommonTypes.h"
 #include "Common/Logging/Log.h"
 #include "Common/Swap.h"
+#include "Core/ConfigManager.h"
 #include "Core/HW/DSP.h"
 #include "Core/HW/DSPHLE/DSPHLE.h"
 #include "Core/HW/DSPHLE/MailHandler.h"
 #include "Core/HW/DSPHLE/UCodes/GBA.h"
 #include "Core/HW/DSPHLE/UCodes/UCodes.h"
+#include "Core/System.h"
 
 namespace DSP::HLE
 {
@@ -367,7 +369,7 @@ void ZeldaUCode::HandleMailLight(u32 mail)
     m_sync_max_voice_id = 0xFFFFFFFF;
     m_sync_voice_skip_flags.fill(0xFFFF);
     RenderAudio();
-    DSP::GenerateDSPInterruptFromDSPEmu(DSP::INT_DSP);
+    Core::System::GetInstance().GetDSP().GenerateDSPInterruptFromDSPEmu(DSP::INT_DSP);
     break;
 
   case MailState::HALTED:
@@ -1535,12 +1537,12 @@ void ZeldaAudioRenderer::Resample(VPB* vpb, const s16* src, MixingBuffer* dst)
   vpb->current_pos_frac = pos & 0xFFF;
 }
 
-void* ZeldaAudioRenderer::GetARAMPtr() const
+void* ZeldaAudioRenderer::GetARAMPtr(u32 offset) const
 {
-  if (m_aram_base_addr)
-    return HLEMemory_Get_Pointer(m_aram_base_addr);
+  if (SConfig::GetInstance().bWii)
+    return HLEMemory_Get_Pointer(m_aram_base_addr + offset);
   else
-    return DSP::GetARAMPtr();
+    return reinterpret_cast<u8*>(Core::System::GetInstance().GetDSP().GetARAMPtr()) + offset;
 }
 
 template <typename T>
@@ -1577,7 +1579,7 @@ void ZeldaAudioRenderer::DownloadPCMSamplesFromARAM(s16* dst, VPB* vpb, u16 requ
       vpb->SetCurrentARAMAddr(vpb->GetBaseAddress() + vpb->GetCurrentPosition() * sizeof(T));
     }
 
-    T* src_ptr = (T*)((u8*)GetARAMPtr() + vpb->GetCurrentARAMAddr());
+    T* src_ptr = (T*)GetARAMPtr(vpb->GetCurrentARAMAddr());
     u16 samples_to_download = std::min(vpb->GetRemainingLength(), (u32)requested_samples_count);
 
     for (u16 i = 0; i < samples_to_download; ++i)
@@ -1712,7 +1714,7 @@ void ZeldaAudioRenderer::DownloadAFCSamplesFromARAM(s16* dst, VPB* vpb, u16 requ
 void ZeldaAudioRenderer::DecodeAFC(VPB* vpb, s16* dst, size_t block_count)
 {
   u32 addr = vpb->GetCurrentARAMAddr();
-  u8* src = (u8*)GetARAMPtr() + addr;
+  u8* src = (u8*)GetARAMPtr(addr);
   vpb->SetCurrentARAMAddr(addr + (u32)block_count * vpb->samples_source_type);
 
   for (size_t b = 0; b < block_count; ++b)

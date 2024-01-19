@@ -10,12 +10,20 @@
 #include <vector>
 
 #include "Common/CommonTypes.h"
-#include "Common/DebugInterface.h"
 #include "Common/Logging/Log.h"
 #include "Core/Core.h"
+#include "Core/Debugger/DebugInterface.h"
 #include "Core/PowerPC/Expression.h"
 #include "Core/PowerPC/JitInterface.h"
 #include "Core/PowerPC/MMU.h"
+#include "Core/PowerPC/PowerPC.h"
+#include "Core/System.h"
+
+BreakPoints::BreakPoints(Core::System& system) : m_system(system)
+{
+}
+
+BreakPoints::~BreakPoints() = default;
 
 bool BreakPoints::IsAddressBreakPoint(u32 address) const
 {
@@ -39,7 +47,7 @@ bool BreakPoints::IsTempBreakPoint(u32 address) const
 const TBreakPoint* BreakPoints::GetBreakpoint(u32 address) const
 {
   auto bp = std::find_if(m_breakpoints.begin(), m_breakpoints.end(),
-                         [address](const auto& bp) { return bp.address == address; });
+                         [address](const auto& bp_) { return bp_.address == address; });
 
   if (bp == m_breakpoints.end())
     return nullptr;
@@ -83,7 +91,6 @@ void BreakPoints::AddFromStrings(const TBreakPointsStr& bp_strings)
 
     if (iss.peek() == '$')
       iss.ignore();
-
     iss >> std::hex >> bp.address;
     iss >> flags;
     bp.is_enabled = flags.find('n') != flags.npos;
@@ -106,7 +113,7 @@ void BreakPoints::Add(TBreakPoint bp)
   if (IsAddressBreakPoint(bp.address))
     return;
 
-  JitInterface::InvalidateICache(bp.address, 4, true);
+  m_system.GetJitInterface().InvalidateICache(bp.address, 4, true);
 
   m_breakpoints.emplace_back(std::move(bp));
 }
@@ -142,7 +149,7 @@ void BreakPoints::Add(u32 address, bool temp, bool break_on_hit, bool log_on_hit
     m_breakpoints.emplace_back(std::move(bp));
   }
 
-  JitInterface::InvalidateICache(address, 4, true);
+  m_system.GetJitInterface().InvalidateICache(address, 4, true);
 }
 
 bool BreakPoints::ToggleBreakPoint(u32 address)
@@ -166,14 +173,14 @@ void BreakPoints::Remove(u32 address)
     return;
 
   m_breakpoints.erase(iter);
-  JitInterface::InvalidateICache(address, 4, true);
+  m_system.GetJitInterface().InvalidateICache(address, 4, true);
 }
 
 void BreakPoints::Clear()
 {
   for (const TBreakPoint& bp : m_breakpoints)
   {
-    JitInterface::InvalidateICache(bp.address, 4, true);
+    m_system.GetJitInterface().InvalidateICache(bp.address, 4, true);
   }
 
   m_breakpoints.clear();
@@ -186,7 +193,7 @@ void BreakPoints::ClearAllTemporary()
   {
     if (bp->is_temporary)
     {
-      JitInterface::InvalidateICache(bp->address, 4, true);
+      m_system.GetJitInterface().InvalidateICache(bp->address, 4, true);
       bp = m_breakpoints.erase(bp);
     }
     else
@@ -196,6 +203,12 @@ void BreakPoints::ClearAllTemporary()
   }
 }
 
+MemChecks::MemChecks(Core::System& system) : m_system(system)
+{
+}
+
+MemChecks::~MemChecks() = default;
+
 MemChecks::TMemChecksStr MemChecks::GetStrings() const
 {
   TMemChecksStr mc_strings;
@@ -203,11 +216,21 @@ MemChecks::TMemChecksStr MemChecks::GetStrings() const
   {
     std::ostringstream ss;
     ss.imbue(std::locale::classic());
+    ss << fmt::format("${:08x} {:08x} ", mc.start_address, mc.end_address);
+    if (mc.is_enabled)
+      ss << 'n';
+    if (mc.is_break_on_read)
+      ss << 'r';
+    if (mc.is_break_on_write)
+      ss << 'w';
+    if (mc.log_on_hit)
+      ss << 'l';
+    if (mc.break_on_hit)
+      ss << 'b';
+    if (mc.condition)
+      ss << "c " << mc.condition->GetText();
 
-    ss << std::hex << mc.start_address << " " << mc.end_address << " " << (mc.is_enabled ? "n" : "")
-       << (mc.is_break_on_read ? "r" : "") << (mc.is_break_on_write ? "w" : "")
-       << (mc.log_on_hit ? "l" : "") << (mc.break_on_hit ? "b" : "");
-    mc_strings.push_back(ss.str());
+    mc_strings.emplace_back(ss.str());
   }
 
   return mc_strings;
@@ -221,6 +244,9 @@ void MemChecks::AddFromStrings(const TMemChecksStr& mc_strings)
     std::istringstream iss(mc_string);
     iss.imbue(std::locale::classic());
 
+    if (iss.peek() == '$')
+      iss.ignore();
+
     std::string flags;
     iss >> std::hex >> mc.start_address >> mc.end_address >> flags;
 
@@ -230,12 +256,19 @@ void MemChecks::AddFromStrings(const TMemChecksStr& mc_strings)
     mc.is_break_on_write = flags.find('w') != flags.npos;
     mc.log_on_hit = flags.find('l') != flags.npos;
     mc.break_on_hit = flags.find('b') != flags.npos;
+    if (flags.find('c') != std::string::npos)
+    {
+      iss >> std::ws;
+      std::string condition;
+      std::getline(iss, condition);
+      mc.condition = Expression::TryParse(condition);
+    }
 
-    Add(mc);
+    Add(std::move(mc));
   }
 }
 
-void MemChecks::Add(const TMemCheck& memory_check)
+void MemChecks::Add(TMemCheck memory_check)
 {
   bool had_any = HasAny();
   Core::RunAsCPUThread([&] {
@@ -254,13 +287,13 @@ void MemChecks::Add(const TMemCheck& memory_check)
     }
     else
     {
-      m_mem_checks.push_back(memory_check);
+      m_mem_checks.emplace_back(std::move(memory_check));
     }
     // If this is the first one, clear the JIT cache so it can switch to
     // watchpoint-compatible code.
     if (!had_any)
-      JitInterface::ClearCache();
-    PowerPC::DBATUpdated();
+      m_system.GetJitInterface().ClearCache();
+    m_system.GetMMU().DBATUpdated();
   });
 }
 
@@ -288,8 +321,8 @@ void MemChecks::Remove(u32 address)
   Core::RunAsCPUThread([&] {
     m_mem_checks.erase(iter);
     if (!HasAny())
-      JitInterface::ClearCache();
-    PowerPC::DBATUpdated();
+      m_system.GetJitInterface().ClearCache();
+    m_system.GetMMU().DBATUpdated();
   });
 }
 
@@ -297,8 +330,8 @@ void MemChecks::Clear()
 {
   Core::RunAsCPUThread([&] {
     m_mem_checks.clear();
-    JitInterface::ClearCache();
-    PowerPC::DBATUpdated();
+    m_system.GetJitInterface().ClearCache();
+    m_system.GetMMU().DBATUpdated();
   });
 }
 
@@ -332,13 +365,14 @@ bool MemChecks::OverlapsMemcheck(u32 address, u32 length) const
   });
 }
 
-bool TMemCheck::Action(Common::DebugInterface* debug_interface, u64 value, u32 addr, bool write,
-                       size_t size, u32 pc)
+bool TMemCheck::Action(Core::System& system, Core::DebugInterface* debug_interface, u64 value,
+                       u32 addr, bool write, size_t size, u32 pc)
 {
   if (!is_enabled)
     return false;
 
-  if ((write && is_break_on_write) || (!write && is_break_on_read))
+  if (((write && is_break_on_write) || (!write && is_break_on_read)) &&
+      EvaluateCondition(system, this->condition))
   {
     if (log_on_hit)
     {

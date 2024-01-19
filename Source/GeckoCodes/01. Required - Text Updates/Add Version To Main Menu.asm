@@ -19,11 +19,11 @@
   add r14, r30, r14     # r14 = text pointer + offset of the text we want to edit
 
   bl BRANCH_LINK_1
-  .long 0x53504F4F 	 # SPOO
-  .long 0x4B59204D 	 # KY M
-  .long 0x53432076 	 # SC v
-  .long 0x302E342E 	 # 0.4.	
-  .long 0x36004353 	 # 6(null)CS
+  .long 0x53504F4F 		# SPOO
+  .long 0x4B59204D 		# KY M
+  .long 0x53432076 		# SC v
+  .long 0x302E342E 		# 0.4.	
+  .long 0x37004353 		# 7(null)CS
   .long 0x4C205354   # L ST
   .long 0x41444941   # ADIA
   .long 0x004F5249   # (null)ORI
@@ -65,5 +65,3 @@
   lmw r14, 0x8 (sp)      # pop r14-r31 off the stack pointer
   addi sp, sp, 0x0050    # release the space
   lwz r0, 20 (r1)        # original instruction at 803014AC
-
-

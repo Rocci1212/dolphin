@@ -8,6 +8,7 @@
 #include <memory>
 #include <mutex>
 #include <string>
+#include <type_traits>
 #include <unordered_map>
 #include <utility>
 #include <vector>
@@ -18,17 +19,19 @@
 
 #include "Core/DolphinAnalytics.h"
 #include "Core/HW/Memmap.h"
+#include "Core/System.h"
 
+#include "VideoCommon/AbstractGfx.h"
 #include "VideoCommon/BPMemory.h"
 #include "VideoCommon/CPMemory.h"
 #include "VideoCommon/DataReader.h"
 #include "VideoCommon/IndexGenerator.h"
 #include "VideoCommon/NativeVertexFormat.h"
-#include "VideoCommon/RenderBase.h"
 #include "VideoCommon/Statistics.h"
 #include "VideoCommon/VertexLoaderBase.h"
 #include "VideoCommon/VertexManagerBase.h"
 #include "VideoCommon/VertexShaderManager.h"
+#include "VideoCommon/VideoConfig.h"
 #include "VideoCommon/XFMemory.h"
 
 namespace VertexLoaderManager
@@ -81,6 +84,9 @@ void UpdateVertexArrayPointers()
   if (!g_bases_dirty) [[likely]]
     return;
 
+  auto& system = Core::System::GetInstance();
+  auto& memory = system.GetMemory();
+
   // Some games such as Burnout 2 can put invalid addresses into
   // the array base registers. (see issue 8591)
   // But the vertex arrays with invalid addresses aren't actually enabled.
@@ -89,24 +95,24 @@ void UpdateVertexArrayPointers()
   // We also only update the array base if the vertex description states we are going to use it.
   if (IsIndexed(g_main_cp_state.vtx_desc.low.Position))
     cached_arraybases[CPArray::Position] =
-        Memory::GetPointer(g_main_cp_state.array_bases[CPArray::Position]);
+        memory.GetPointer(g_main_cp_state.array_bases[CPArray::Position]);
 
   if (IsIndexed(g_main_cp_state.vtx_desc.low.Normal))
     cached_arraybases[CPArray::Normal] =
-        Memory::GetPointer(g_main_cp_state.array_bases[CPArray::Normal]);
+        memory.GetPointer(g_main_cp_state.array_bases[CPArray::Normal]);
 
   for (u8 i = 0; i < g_main_cp_state.vtx_desc.low.Color.Size(); i++)
   {
     if (IsIndexed(g_main_cp_state.vtx_desc.low.Color[i]))
       cached_arraybases[CPArray::Color0 + i] =
-          Memory::GetPointer(g_main_cp_state.array_bases[CPArray::Color0 + i]);
+          memory.GetPointer(g_main_cp_state.array_bases[CPArray::Color0 + i]);
   }
 
   for (u8 i = 0; i < g_main_cp_state.vtx_desc.high.TexCoord.Size(); i++)
   {
     if (IsIndexed(g_main_cp_state.vtx_desc.high.TexCoord[i]))
       cached_arraybases[CPArray::TexCoord0 + i] =
-          Memory::GetPointer(g_main_cp_state.array_bases[CPArray::TexCoord0 + i]);
+          memory.GetPointer(g_main_cp_state.array_bases[CPArray::TexCoord0 + i]);
   }
 
   g_bases_dirty = false;
@@ -135,7 +141,7 @@ NativeVertexFormat* GetOrCreateMatchingFormat(const PortableVertexDeclaration& d
   auto iter = s_native_vertex_map.find(decl);
   if (iter == s_native_vertex_map.end())
   {
-    std::unique_ptr<NativeVertexFormat> fmt = g_renderer->CreateNativeVertexFormat(decl);
+    std::unique_ptr<NativeVertexFormat> fmt = g_gfx->CreateNativeVertexFormat(decl);
     auto ipair = s_native_vertex_map.emplace(decl, std::move(fmt));
     iter = ipair.first;
   }
@@ -148,7 +154,8 @@ NativeVertexFormat* GetUberVertexFormat(const PortableVertexDeclaration& decl)
   // The padding in the structs can cause the memcmp() in the map to create duplicates.
   // Avoid this by initializing the padding to zero.
   PortableVertexDeclaration new_decl;
-  std::memset(&new_decl, 0, sizeof(new_decl));
+  static_assert(std::is_trivially_copyable_v<PortableVertexDeclaration>);
+  std::memset(static_cast<void*>(&new_decl), 0, sizeof(new_decl));
   new_decl.stride = decl.stride;
 
   auto MakeDummyAttribute = [](AttributeFormat& attr, ComponentFormat type, int components,
@@ -246,11 +253,6 @@ VertexLoaderBase* GetOrCreateLoader(int vtx_attr_group)
 
 static void CheckCPConfiguration(int vtx_attr_group)
 {
-  if (!g_needs_cp_xf_consistency_check) [[likely]]
-    return;
-
-  g_needs_cp_xf_consistency_check = false;
-
   // Validate that the XF input configuration matches the CP configuration
   u32 num_cp_colors = std::count_if(
       g_main_cp_state.vtx_desc.low.Color.begin(), g_main_cp_state.vtx_desc.low.Color.end(),
@@ -347,29 +349,52 @@ int RunVertices(int vtx_attr_group, OpcodeDecoder::Primitive primitive, int coun
     // Doing early return for the opposite case would be cleaner
     // but triggers a false unreachable code warning in MSVC debug builds.
 
-    CheckCPConfiguration(vtx_attr_group);
+    if (g_needs_cp_xf_consistency_check) [[unlikely]]
+    {
+      CheckCPConfiguration(vtx_attr_group);
+      g_needs_cp_xf_consistency_check = false;
+    }
 
     // If the native vertex format changed, force a flush.
     if (loader->m_native_vertex_format != s_current_vtx_fmt ||
         loader->m_native_components != g_current_components) [[unlikely]]
     {
       g_vertex_manager->Flush();
+
+      s_current_vtx_fmt = loader->m_native_vertex_format;
+      g_current_components = loader->m_native_components;
+      auto& system = Core::System::GetInstance();
+      auto& vertex_shader_manager = system.GetVertexShaderManager();
+      vertex_shader_manager.SetVertexFormat(loader->m_native_components,
+                                            loader->m_native_vertex_format->GetVertexDeclaration());
     }
-    s_current_vtx_fmt = loader->m_native_vertex_format;
-    g_current_components = loader->m_native_components;
-    VertexShaderManager::SetVertexFormat(loader->m_native_components,
-                                         loader->m_native_vertex_format->GetVertexDeclaration());
+
+    // CPUCull's performance increase comes from encoding fewer GPU commands, not sending less data
+    // Therefore it's only useful to check if culling could remove a flush
+    const bool can_cpu_cull = g_ActiveConfig.bCPUCull &&
+                              primitive < OpcodeDecoder::Primitive::GX_DRAW_LINES &&
+                              !g_vertex_manager->HasSendableVertices();
 
     // if cull mode is CULL_ALL, tell VertexManager to skip triangles and quads.
-    // They still need to go through vertex loading, because we need to calculate a zfreeze refrence
-    // slope.
-    bool cullall = (bpmem.genMode.cullmode == CullMode::All &&
-                    primitive < OpcodeDecoder::Primitive::GX_DRAW_LINES);
+    // They still need to go through vertex loading, because we need to calculate a zfreeze
+    // reference slope.
+    const bool cullall = (bpmem.genMode.cullmode == CullMode::All &&
+                          primitive < OpcodeDecoder::Primitive::GX_DRAW_LINES);
 
-    DataReader dst = g_vertex_manager->PrepareForAdditionalData(
-        primitive, count, loader->m_native_vtx_decl.stride, cullall);
+    const int stride = loader->m_native_vtx_decl.stride;
+    DataReader dst = g_vertex_manager->PrepareForAdditionalData(primitive, count, stride,
+                                                                cullall || can_cpu_cull);
 
     count = loader->RunVertices(src, dst.GetPointer(), count);
+
+    if (can_cpu_cull && !cullall)
+    {
+      if (!g_vertex_manager->AreAllVerticesCulled(loader, primitive, dst.GetPointer(), count))
+      {
+        DataReader new_dst = g_vertex_manager->DisableCullAll(stride);
+        memmove(new_dst.GetPointer(), dst.GetPointer(), count * stride);
+      }
+    }
 
     g_vertex_manager->AddIndices(primitive, count);
     g_vertex_manager->FlushData(count, loader->m_native_vtx_decl.stride);

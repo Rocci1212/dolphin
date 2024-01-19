@@ -24,6 +24,7 @@
 
 #include "DolphinQt/QtUtils/ModalMessageBox.h"
 #include "DolphinQt/QtUtils/NonDefaultQPushButton.h"
+#include "DolphinQt/QtUtils/SetWindowDecorations.h"
 #include "DolphinQt/QtUtils/SignalBlocking.h"
 #include "DolphinQt/Settings.h"
 
@@ -33,12 +34,10 @@
 #endif
 
 constexpr int AUTO_UPDATE_DISABLE_INDEX = 0;
-constexpr int AUTO_UPDATE_STABLE_INDEX = 1;
-constexpr int AUTO_UPDATE_BETA_INDEX = 2;
-constexpr int AUTO_UPDATE_DEV_INDEX = 3;
+constexpr int AUTO_UPDATE_BETA_INDEX = 1;
+constexpr int AUTO_UPDATE_DEV_INDEX = 2;
 
 constexpr const char* AUTO_UPDATE_DISABLE_STRING = "";
-constexpr const char* AUTO_UPDATE_STABLE_STRING = "stable";
 constexpr const char* AUTO_UPDATE_BETA_STRING = "beta";
 constexpr const char* AUTO_UPDATE_DEV_STRING = "dev";
 
@@ -85,7 +84,7 @@ void GeneralPane::OnEmulationStateChanged(Core::State state)
   const bool running = state != Core::State::Uninitialized;
 
   m_checkbox_dualcore->setEnabled(!running);
-  m_checkbox_enableReplays->setEnabled(!running);
+  m_checkbox_enable_replays->setEnabled(!running);
   m_checkbox_cheats->setEnabled(!running);
   m_checkbox_override_region_settings->setEnabled(!running);
 #ifdef USE_DISCORD_PRESENCE
@@ -97,7 +96,7 @@ void GeneralPane::OnEmulationStateChanged(Core::State state)
 void GeneralPane::ConnectLayout()
 {
   connect(m_checkbox_dualcore, &QCheckBox::toggled, this, &GeneralPane::OnSaveConfig);
-  connect(m_checkbox_enableReplays, &QCheckBox::toggled, this, &GeneralPane::OnSaveConfig);
+  connect(m_checkbox_enable_replays, &QCheckBox::toggled, this, &GeneralPane::OnSaveConfig);
   connect(m_checkbox_cheats, &QCheckBox::toggled, this, &GeneralPane::OnSaveConfig);
   connect(m_checkbox_override_region_settings, &QCheckBox::stateChanged, this,
           &GeneralPane::OnSaveConfig);
@@ -108,20 +107,20 @@ void GeneralPane::ConnectLayout()
 
   if (AutoUpdateChecker::SystemSupportsAutoUpdates())
   {
-    connect(m_combobox_update_track, qOverload<int>(&QComboBox::currentIndexChanged), this,
+    connect(m_combobox_update_track, &QComboBox::currentIndexChanged, this,
             &GeneralPane::OnSaveConfig);
     connect(&Settings::Instance(), &Settings::AutoUpdateTrackChanged, this,
             &GeneralPane::LoadConfig);
   }
 
   // Advanced
-  connect(m_combobox_speedlimit, qOverload<int>(&QComboBox::currentIndexChanged), [this]() {
+  connect(m_combobox_speedlimit, &QComboBox::currentIndexChanged, [this]() {
     Config::SetBaseOrCurrent(Config::MAIN_EMULATION_SPEED,
                              m_combobox_speedlimit->currentIndex() * 0.1f);
     Config::Save();
   });
 
-  connect(m_combobox_fallback_region, qOverload<int>(&QComboBox::currentIndexChanged), this,
+  connect(m_combobox_fallback_region, &QComboBox::currentIndexChanged, this,
           &GeneralPane::OnSaveConfig);
   connect(&Settings::Instance(), &Settings::FallbackRegionChanged, this, &GeneralPane::LoadConfig);
 
@@ -143,8 +142,8 @@ void GeneralPane::CreateBasic()
   m_checkbox_dualcore = new QCheckBox(tr("Enable Dual Core (speedup)"));
   basic_group_layout->addWidget(m_checkbox_dualcore);
 
-  m_checkbox_enableReplays = new QCheckBox(tr("Enable Replay Files"));
-  basic_group_layout->addWidget(m_checkbox_enableReplays);
+  m_checkbox_enable_replays = new QCheckBox(tr("Enable Replay Files"));
+  basic_group_layout->addWidget(m_checkbox_enable_replays);
 
   m_checkbox_cheats = new QCheckBox(tr("Enable Cheats"));
   basic_group_layout->addWidget(m_checkbox_cheats);
@@ -196,8 +195,8 @@ void GeneralPane::CreateAutoUpdate()
 
   auto_update_group_layout->addRow(tr("&Auto Update:"), m_combobox_update_track);
 
-  for (const QString& option : {tr("Don't Update"), tr("Stable (once a year)"),
-                                tr("Beta (once a month)"), tr("Dev (multiple times a day)")})
+  for (const QString& option :
+       {tr("Don't Update"), tr("Beta (once a month)"), tr("Dev (multiple times a day)")})
     m_combobox_update_track->addItem(option);
 }
 
@@ -249,14 +248,15 @@ void GeneralPane::LoadConfig()
   if (AutoUpdateChecker::SystemSupportsAutoUpdates())
   {
     const auto track = Settings::Instance().GetAutoUpdateTrack().toStdString();
+
+    // If the track doesn't match any known value, set to "beta" which is the
+    // default config value on Dolphin release builds.
     if (track == AUTO_UPDATE_DISABLE_STRING)
       SignalBlocking(m_combobox_update_track)->setCurrentIndex(AUTO_UPDATE_DISABLE_INDEX);
-    else if (track == AUTO_UPDATE_STABLE_STRING)
-      SignalBlocking(m_combobox_update_track)->setCurrentIndex(AUTO_UPDATE_STABLE_INDEX);
-    else if (track == AUTO_UPDATE_BETA_STRING)
-      SignalBlocking(m_combobox_update_track)->setCurrentIndex(AUTO_UPDATE_BETA_INDEX);
-    else
+    else if (track == AUTO_UPDATE_DEV_STRING)
       SignalBlocking(m_combobox_update_track)->setCurrentIndex(AUTO_UPDATE_DEV_INDEX);
+    else
+      SignalBlocking(m_combobox_update_track)->setCurrentIndex(AUTO_UPDATE_BETA_INDEX);
   }
 
 #if defined(USE_ANALYTICS) && USE_ANALYTICS
@@ -264,7 +264,7 @@ void GeneralPane::LoadConfig()
       ->setChecked(Settings::Instance().IsAnalyticsEnabled());
 #endif
   SignalBlocking(m_checkbox_dualcore)->setChecked(Config::Get(Config::MAIN_CPU_THREAD));
-  SignalBlocking(m_checkbox_enableReplays)->setChecked(Config::Get(Config::MAIN_REPLAYS_NETPLAY));
+  SignalBlocking(m_checkbox_enable_replays)->setChecked(Config::Get(Config::MAIN_REPLAYS_NETPLAY));
   SignalBlocking(m_checkbox_cheats)->setChecked(Settings::Instance().GetCheatsEnabled());
   SignalBlocking(m_checkbox_override_region_settings)
       ->setChecked(Config::Get(Config::MAIN_OVERRIDE_REGION_SETTINGS));
@@ -300,9 +300,6 @@ static QString UpdateTrackFromIndex(int index)
   {
   case AUTO_UPDATE_DISABLE_INDEX:
     value = QString::fromStdString(AUTO_UPDATE_DISABLE_STRING);
-    break;
-  case AUTO_UPDATE_STABLE_INDEX:
-    value = QString::fromStdString(AUTO_UPDATE_STABLE_STRING);
     break;
   case AUTO_UPDATE_BETA_INDEX:
     value = QString::fromStdString(AUTO_UPDATE_BETA_STRING);
@@ -360,7 +357,7 @@ void GeneralPane::OnSaveConfig()
   DolphinAnalytics::Instance().ReloadConfig();
 #endif
   Config::SetBaseOrCurrent(Config::MAIN_CPU_THREAD, m_checkbox_dualcore->isChecked());
-  Config::SetBaseOrCurrent(Config::MAIN_REPLAYS_NETPLAY, m_checkbox_enableReplays->isChecked());
+  Config::SetBaseOrCurrent(Config::MAIN_REPLAYS_NETPLAY, m_checkbox_enable_replays->isChecked());
   Settings::Instance().SetCheatsEnabled(m_checkbox_cheats->isChecked());
   Config::SetBaseOrCurrent(Config::MAIN_OVERRIDE_REGION_SETTINGS,
                            m_checkbox_override_region_settings->isChecked());
@@ -381,6 +378,7 @@ void GeneralPane::GenerateNewIdentity()
   message_box.setIcon(QMessageBox::Information);
   message_box.setWindowTitle(tr("Identity Generation"));
   message_box.setText(tr("New identity generated."));
+  SetQWidgetWindowDecorations(&message_box);
   message_box.exec();
 }
 #endif

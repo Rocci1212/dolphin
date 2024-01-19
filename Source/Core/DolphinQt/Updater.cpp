@@ -3,6 +3,7 @@
 
 #include "DolphinQt/Updater.h"
 
+#include <cstdlib>
 #include <utility>
 
 #include <QCheckBox>
@@ -16,6 +17,7 @@
 #include "Common/Version.h"
 
 #include "DolphinQt/QtUtils/RunOnObject.h"
+#include "DolphinQt/QtUtils/SetWindowDecorations.h"
 #include "DolphinQt/Settings.h"
 #include <qdesktopservices.h>
 
@@ -56,6 +58,7 @@ void Updater::OnUpdateAvailable(std::string info)
     label->setTextFormat(Qt::RichText);
 
     auto* buttons = new QDialogButtonBox;
+
     auto* projectrio =
         buttons->addButton(tr("Download Spooky Dolphin here"), QDialogButtonBox::AcceptRole);
 
@@ -70,6 +73,7 @@ void Updater::OnUpdateAvailable(std::string info)
     dialog->setLayout(layout);
     layout->addWidget(buttons);
 
+    SetQWidgetWindowDecorations(dialog);
     return dialog->exec();
   });
 }

@@ -3,6 +3,7 @@
 
 #include "UICommon/AutoUpdate.h"
 
+#include <cstdlib>
 #include <string>
 
 #include <fmt/format.h>
@@ -19,12 +20,13 @@
 
 #ifdef _WIN32
 #include <Windows.h>
+#else
+#include <sys/types.h>
+#include <unistd.h>
 #endif
 
 #ifdef __APPLE__
 #include <sys/stat.h>
-#include <sys/types.h>
-#include <unistd.h>
 #endif
 
 #if defined(_WIN32) || defined(__APPLE__)
@@ -116,7 +118,7 @@ std::string GenerateChangelog(const picojson::array& versions)
         changelog += ver_obj["shortrev"].get<std::string>();
       }
       const std::string escaped_description =
-          GetEscapedHtml(ver_obj["short_descr"].get<std::string>());
+          Common::GetEscapedHtml(ver_obj["short_descr"].get<std::string>());
       changelog += " by <a href = \"" + ver_obj["author_url"].get<std::string>() + "\">" +
                    ver_obj["author"].get<std::string>() + "</a> &mdash; " + escaped_description;
     }
@@ -140,26 +142,16 @@ bool AutoUpdateChecker::SystemSupportsAutoUpdates()
   return false;
 #endif
 }
-/*
-static std::string GetPlatformID()
+
+static u32 GetOwnProcessId()
 {
-#if defined(_WIN32)
-#if defined(_M_ARM_64)
-  return "win-arm64";
+#ifdef _WIN32
+  return GetCurrentProcessId();
 #else
-  return "win";
-#endif
-#elif defined(__APPLE__)
-#if defined(MACOS_UNIVERSAL_BUILD)
-  return "macos-universal";
-#else
-  return "macos";
-#endif
-#else
-  return "unknown";
+  return getpid();
 #endif
 }
-*/
+
 void AutoUpdateChecker::CheckForUpdate(std::string_view update_track,
                                        std::string_view hash_override, const CheckType check_type)
 {
@@ -170,16 +162,14 @@ void AutoUpdateChecker::CheckForUpdate(std::string_view update_track,
   // This url returns a json containing info about the latest release
   std::string url = "https://api.github.com/repos/Rocci1212/spooky-dolphin/releases/latest";
   Common::HttpRequest::Headers headers = {
-      {"user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like "
-                     "Gecko) Chrome/97.0.4692.71 Safari/537.36"}};
+      {"user-agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:120.0) Gecko/20100101 Firefox/120.0"}};
 
   Common::HttpRequest req{std::chrono::seconds{10}};
   auto resp = req.Get(url, headers);
   if (!resp)
   {
-    ERROR_LOG_FMT(COMMON, "Auto-update request failed");
+    ERROR_LOG_FMT(COMMON, "Auto-update request failed"); // MDC
   }
-  
   const std::string contents(reinterpret_cast<char*>(resp->data()), resp->size());
   INFO_LOG_FMT(COMMON, "Auto-update JSON response: {}", contents);
 
@@ -255,11 +245,7 @@ void AutoUpdateChecker::TriggerUpdate(const AutoUpdateChecker::NewVersionInforma
   updater_flags["this-manifest-url"] = info.this_manifest_url;
   updater_flags["next-manifest-url"] = info.next_manifest_url;
   updater_flags["content-store-url"] = info.content_store_url;
-#ifdef _WIN32
-  updater_flags["parent-pid"] = std::to_string(GetCurrentProcessId());
-#else
-  updater_flags["parent-pid"] = std::to_string(getpid());
-#endif
+  updater_flags["parent-pid"] = std::to_string(GetOwnProcessId());
   updater_flags["install-base-path"] = File::GetExeDirectory();
   updater_flags["log-file"] = File::GetUserPath(D_LOGS_IDX) + UPDATER_LOG_FILE;
 
@@ -269,7 +255,7 @@ void AutoUpdateChecker::TriggerUpdate(const AutoUpdateChecker::NewVersionInforma
 #ifdef __APPLE__
   // Copy the updater so it can update itself if needed.
   const std::string reloc_updater_path = UpdaterPath(true);
-  if (!File::CopyDir(UpdaterPath(), reloc_updater_path))
+  if (!File::Copy(UpdaterPath(), reloc_updater_path))
   {
     CriticalAlertFmtT("Unable to create updater copy.");
     return;
@@ -297,13 +283,13 @@ void AutoUpdateChecker::TriggerUpdate(const AutoUpdateChecker::NewVersionInforma
   }
   else
   {
-    const std::string error = GetLastErrorString();
+    const std::string error = Common::GetLastErrorString();
     CriticalAlertFmtT("Could not start updater process: {0}", error);
   }
 #else
   if (popen(command_line.c_str(), "r") == nullptr)
   {
-    const std::string error = LastStrerrorString();
+    const std::string error = Common::LastStrerrorString();
     CriticalAlertFmtT("Could not start updater process: {0}", error);
   }
 #endif

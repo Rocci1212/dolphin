@@ -37,7 +37,6 @@ public:
   static const u32 addressStadiumID = 0x80C66418;
   /*
   static const u32 addressStadiumID = 0x81536a00;
-
   // left team
   static const u32 addressLeftSideScore = 0x81536a56;
   static const u32 addressLeftSideShots = 0x81536a52;
@@ -45,7 +44,6 @@ public:
   static const u32 addressLeftSideSteals = 0x81536a6e;
   static const u32 addressLeftSideSuperStrikes = 0x81536af2;
   static const u32 addressLeftSidePerfectPasses = 0x81536a74;
-
   // right team
   static const u32 addressRightSideScore = 0x81536a58;
   static const u32 addressRightSideShots = 0x81536a92;
@@ -101,7 +99,6 @@ public:
   static const u32 addressLeftTeamMissedShotsBallXPos = 0x80430020;
   static const u32 addressLeftTeamMissedShotsBallYPos = 0x80430024;
   static const u32 addressLeftTeamMissedShotsTimestamp = 0x80430028;
-
   // right team item
   static const u32 addressRightTeamItemStart = 0x80420000;
   static const u32 addressRightTeamItemOffset = 0x80430010;
@@ -113,17 +110,14 @@ public:
   static const u32 addressRightTeamMissedShotsBallXPos = 0x80430030;
   static const u32 addressRightTeamMissedShotsBallYPos = 0x80430034;
   static const u32 addressRightTeamMissedShotsTimestamp = 0x80430038;
-
   // left team goal
   static const u32 addressLeftTeamGoalStart = 0x80440000;
   // right team goal
   static const u32 addressRightTeamGoalStart = 0x80450000;
-
   // left team missed shots
   static const u32 addressLeftTeamMissedShotsStart = 0x80460000;
   // right team missed shots
   static const u32 addressRightTeamMissedShotsStart = 0x80470000;
-
   // i thought about putting these next 2 at 8040000c/e and making them half words
   // but if a player got more than ffff, aka 18 minutes, we would experience disparity
   //

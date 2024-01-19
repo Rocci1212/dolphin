@@ -3,11 +3,6 @@
 
 #include "Core/Movie.h"
 
-#include <filesystem>  // C++17
-#include <iostream>
-namespace fs = std::filesystem;
-#include "unzip.h"
-
 #include <algorithm>
 #include <array>
 #include <cctype>
@@ -75,11 +70,17 @@ namespace fs = std::filesystem;
 
 #include "InputCommon/GCPadStatus.h"
 
-#include <direct.h>
 #include "VideoCommon/VideoBackendBase.h"
 #include "VideoCommon/VideoConfig.h"
+
+#include <filesystem> // C++17
+#include <iostream>
+#include "unzip.h"
+#include <direct.h>
 #include "Core/StateAuxillary.h"
 #include <Core/Metadata.h>
+namespace fs = std::filesystem;
+
 
 // The chunk to allocate movie data in multiples of.
 #define DTM_BASE_LENGTH (1024)
@@ -177,9 +178,10 @@ std::string GetInputDisplay()
     s_wiimotes = {};
     for (int i = 0; i < 4; ++i)
     {
-      if (SerialInterface::GetDeviceType(i) == SerialInterface::SIDEVICE_GC_GBA_EMULATED)
+      auto& si = Core::System::GetInstance().GetSerialInterface();
+      if (si.GetDeviceType(i) == SerialInterface::SIDEVICE_GC_GBA_EMULATED)
         s_controllers[i] = ControllerType::GBA;
-      else if (SerialInterface::GetDeviceType(i) != SerialInterface::SIDEVICE_NONE)
+      else if (si.GetDeviceType(i) != SerialInterface::SIDEVICE_NONE)
         s_controllers[i] = ControllerType::GC;
       else
         s_controllers[i] = ControllerType::None;
@@ -209,7 +211,8 @@ std::string GetRTCDisplay()
 {
   using ExpansionInterface::CEXIIPL;
 
-  const time_t current_time = CEXIIPL::GetEmulatedTime(CEXIIPL::UNIX_EPOCH);
+  const time_t current_time =
+      CEXIIPL::GetEmulatedTime(Core::System::GetInstance(), CEXIIPL::UNIX_EPOCH);
   const tm* const gm_time = gmtime(&current_time);
 
   std::ostringstream format_time;
@@ -491,6 +494,7 @@ void ChangePads()
   if (s_controllers == controllers)
     return;
 
+  auto& si = Core::System::GetInstance().GetSerialInterface();
   for (int i = 0; i < SerialInterface::MAX_SI_CHANNELS; ++i)
   {
     SerialInterface::SIDevices device = SerialInterface::SIDEVICE_NONE;
@@ -512,7 +516,7 @@ void ChangePads()
       }
     }
 
-    SerialInterface::ChangeDevice(device, i);
+    si.ChangeDevice(device, i);
   }
 }
 
@@ -608,6 +612,15 @@ bool BeginRecordingInput(const ControllerTypeArray& controllers,
     s_temp_input.clear();
 
     s_currentByte = 0;
+
+    // This is a bit of a hack, SYSCONF movie code expects the movie layer active for both recording
+    // and playback. That layer is really only designed for playback, not recording. Also, we can't
+    // know if we're using a Wii at this point. So, we'll assume a Wii is used here. In practice,
+    // this shouldn't affect anything for GC (as its only unique setting is language, which will be
+    // taken from base settings as expected)
+    static DTMHeader header = {.bWii = true};
+    ConfigLoaders::SaveToDTM(&header);
+    Config::AddLayer(ConfigLoaders::GenerateMovieConfigLoader(&header));
 
     if (Core::IsRunning())
       Core::UpdateWantDeterminism();
@@ -959,7 +972,6 @@ void ReadHeader()
   SConfig::GetInstance().SaveSettings();
 }
 
-
 #define dir_delimiter '/'
 #define MAX_FILENAME 512
 #define READ_SIZE 8192
@@ -969,7 +981,6 @@ bool PlayInput(const std::string& movie_path, std::optional<std::string>* savest
 {
   // we're going to set controllers on/off about 50 lines after this, so we need to
   // get the user's current ports so that we can set it back after the movie is closed out of
-
   const SerialInterface::SIDevices currentDevice0 =
       Config::Get(Config::GetInfoForSIDevice(static_cast<int>(0)));
   const SerialInterface::SIDevices currentDevice1 =
@@ -986,7 +997,7 @@ bool PlayInput(const std::string& movie_path, std::optional<std::string>* savest
   if (s_playMode != PlayMode::None)
     return false;
 
-  // check if it's a citrus playback file
+    // check if it's a citrus playback file
   fs::path temp_movie_path = movie_path;
   if (temp_movie_path.extension() == ".boo")
   {
@@ -1099,8 +1110,7 @@ bool PlayInput(const std::string& movie_path, std::optional<std::string>* savest
     unzClose(zipfile);
   }
 
-  File::IOFile recording_file(actual_movie_path, "rb");
-
+  File::IOFile recording_file(movie_path, "rb");
   if (!recording_file.ReadArray(&tmpHeader, 1))
     return false;
 
@@ -1141,9 +1151,12 @@ bool PlayInput(const std::string& movie_path, std::optional<std::string>* savest
     }
     else
     {
+      // TODO: i need to test, but i don't think i want this
+      /*
       PanicAlertFmtT("Movie {0} indicates that it starts from a savestate, but {1} doesn't exist. "
                      "The movie will likely not sync!",
-                     movie_path, savestate_path_temp);
+                     actual_movie_path, savestate_path_temp);
+      */
     }
 
     s_bRecordingFromSaveState = true;
@@ -1340,7 +1353,6 @@ static void CheckInputEnd()
   {
     EndPlayInput(!s_bReadOnly);
 
-    // delete citrus residue if any
     std::thread t1(&StateAuxillary::endPlayback);
     t1.detach();
     StateAuxillary::setPostPort();
@@ -1419,17 +1431,24 @@ void PlayController(GCPadStatus* PadStatus, int controllerID)
   if (s_padState.disc)
   {
     Core::RunAsCPUThread([] {
-      if (!DVDInterface::AutoChangeDisc())
+      auto& system = Core::System::GetInstance();
+      if (!system.GetDVDInterface().AutoChangeDisc())
       {
+        // TODO check if this continues to cause issues
+        /*
         // rocci i don't know what this means, but it's causing issues
-        //CPU::Break();
-        //PanicAlertFmtT("Change the disc to {0}", s_discChange);
+        system.GetCPU().Break();
+        PanicAlertFmtT("Change the disc to {0}", s_discChange);
+        */
       }
     });
   }
 
   if (s_padState.reset)
-    ProcessorInterface::ResetButton_Tap();
+  {
+    auto& system = Core::System::GetInstance();
+    system.GetProcessorInterface().ResetButton_Tap();
+  }
 
   SetInputDisplayString(s_padState, controllerID);
   CheckInputEnd();
@@ -1499,9 +1518,11 @@ void EndPlayInput(bool cont)
   else if (s_playMode != PlayMode::None)
   {
     // We can be called by EmuThread during boot (CPU::State::PowerDown)
-    bool was_running = Core::IsRunningAndStarted() && !CPU::IsStepping();
+    auto& system = Core::System::GetInstance();
+    auto& cpu = system.GetCPU();
+    bool was_running = Core::IsRunningAndStarted() && !cpu.IsStepping();
     if (was_running && Config::Get(Config::MAIN_MOVIE_PAUSE_MOVIE))
-      CPU::Break();
+      cpu.Break();
     s_rerecords = 0;
     s_currentByte = 0;
 
@@ -1513,6 +1534,7 @@ void EndPlayInput(bool cont)
     s_playMode = PlayMode::None;
     Core::DisplayMessage("Movie End.", 2000);
     s_bRecordingFromSaveState = false;
+    Config::RemoveLayer(Config::LayerType::Movie);
     // we don't clear these things because otherwise we can't resume playback if we load a movie
     // state later
     // s_totalFrames = s_totalBytes = 0;
@@ -1541,6 +1563,10 @@ void SaveRecording(const std::string& filename)
   header.GBAControllers = 0;
   for (int i = 0; i < 4; ++i)
   {
+    if (IsUsingGBA(i))
+      header.GBAControllers |= 1 << i;
+    if (IsUsingPad(i))
+      header.controllers |= 1 << i;
     if (IsUsingWiimote(i) && SConfig::GetInstance().bWii)
       header.controllers |= 1 << (i + 4);
   }
@@ -1620,25 +1646,17 @@ void SaveRecording(const std::string& filename)
   save_record.WriteArray(&header, 1);
 
   bool success = save_record.WriteBytes(s_temp_input.data(), s_temp_input.size());
-  if (success)
-  {
-    Core::DisplayMessage("DTM saved", 2000);
-  }
-  else
-  {
-    Core::DisplayMessage("Failed to save DTM to: " + filename, 2000);
-  }
 
   if (success && s_bRecordingFromSaveState)
   {
     std::string stateFilename = filename + ".sav";
-    success = File::Copy(File::GetUserPath(D_STATESAVES_IDX) + "dtm.sav", stateFilename);
+    success = File::CopyRegularFile(File::GetUserPath(D_STATESAVES_IDX) + "dtm.sav", stateFilename);
   }
 
   if (success)
-    Core::DisplayMessage("Save State saved", 2000);
+    Core::DisplayMessage(fmt::format("DTM {} saved", filename), 2000);
   else
-    Core::DisplayMessage(fmt::format("Failed to save Save State to {}.sav", filename), 2000);
+    Core::DisplayMessage(fmt::format("Failed to save {}", filename), 2000);
 }
 
 // NOTE: GPU Thread
@@ -1667,8 +1685,8 @@ void GetSettings()
   if (SConfig::GetInstance().bWii)
   {
     u64 title_id = SConfig::GetInstance().GetTitleID();
-    s_bClearSave = !File::Exists(Common::GetTitleDataPath(title_id, Common::FROM_SESSION_ROOT) +
-                                 "/banner.bin");
+    s_bClearSave = !File::Exists(
+        Common::GetTitleDataPath(title_id, Common::FromWhichRoot::Session) + "/banner.bin");
   }
   else
   {
@@ -1753,6 +1771,7 @@ static void CheckMD5()
     Core::DisplayMessage("Checksum of current game matches the recorded game.", 2000);
   else
     Core::DisplayMessage("Checksum of current game does not match the recorded game!", 3000);
+
   Metadata::setMD5(s_MD5);
 }
 
@@ -1774,7 +1793,8 @@ void Shutdown()
   s_temp_input.clear();
 
   // shutdown is called any time the game (core) is closed
-  // delete any residue from shutting down a playback early that wasn't handled from graceful movie end
+  // delete any residue from shutting down a playback early that wasn't handled from graceful movie
+  // end
   std::thread t1(&StateAuxillary::endPlayback);
   t1.detach();
 }

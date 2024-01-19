@@ -22,6 +22,7 @@
 #include "Core/HW/DSPHLE/UCodes/AX.h"
 #include "Core/HW/DSPHLE/UCodes/AXStructs.h"
 #include "Core/HW/Memmap.h"
+#include "Core/System.h"
 
 namespace DSP::HLE
 {
@@ -101,10 +102,13 @@ bool HasLpf(u32 crc)
 // Read a PB from MRAM/ARAM
 void ReadPB(u32 addr, PB_TYPE& pb, u32 crc)
 {
+  auto& system = Core::System::GetInstance();
+  auto& memory = system.GetMemory();
+
   if (HasLpf(crc))
   {
     u16* dst = (u16*)&pb;
-    Memory::CopyFromEmuSwapped<u16>(dst, addr, sizeof(pb));
+    memory.CopyFromEmuSwapped<u16>(dst, addr, sizeof(pb));
   }
   else
   {
@@ -116,19 +120,22 @@ void ReadPB(u32 addr, PB_TYPE& pb, u32 crc)
     constexpr size_t lpf_off = offsetof(AXPB, lpf);
     constexpr size_t lc_off = offsetof(AXPB, loop_counter);
 
-    Memory::CopyFromEmuSwapped<u16>((u16*)dst, addr, lpf_off);
+    memory.CopyFromEmuSwapped<u16>((u16*)dst, addr, lpf_off);
     memset(dst + lpf_off, 0, lc_off - lpf_off);
-    Memory::CopyFromEmuSwapped<u16>((u16*)(dst + lc_off), addr + lpf_off, sizeof(pb) - lc_off);
+    memory.CopyFromEmuSwapped<u16>((u16*)(dst + lc_off), addr + lpf_off, sizeof(pb) - lc_off);
   }
 }
 
 // Write a PB back to MRAM/ARAM
 void WritePB(u32 addr, const PB_TYPE& pb, u32 crc)
 {
+  auto& system = Core::System::GetInstance();
+  auto& memory = system.GetMemory();
+
   if (HasLpf(crc))
   {
     const u16* src = (const u16*)&pb;
-    Memory::CopyToEmuSwapped<u16>(addr, src, sizeof(pb));
+    memory.CopyToEmuSwapped<u16>(addr, src, sizeof(pb));
   }
   else
   {
@@ -140,8 +147,8 @@ void WritePB(u32 addr, const PB_TYPE& pb, u32 crc)
     constexpr size_t lpf_off = offsetof(AXPB, lpf);
     constexpr size_t lc_off = offsetof(AXPB, loop_counter);
 
-    Memory::CopyToEmuSwapped<u16>(addr, (const u16*)src, lpf_off);
-    Memory::CopyToEmuSwapped<u16>(addr + lpf_off, (const u16*)(src + lc_off), sizeof(pb) - lc_off);
+    memory.CopyToEmuSwapped<u16>(addr, (const u16*)src, lpf_off);
+    memory.CopyToEmuSwapped<u16>(addr + lpf_off, (const u16*)(src + lc_off), sizeof(pb) - lc_off);
   }
 }
 
@@ -180,8 +187,14 @@ protected:
     }
   }
 
-  u8 ReadMemory(u32 address) override { return ReadARAM(address); }
-  void WriteMemory(u32 address, u8 value) override { WriteARAM(value, address); }
+  u8 ReadMemory(u32 address) override
+  {
+    return Core::System::GetInstance().GetDSP().ReadARAM(address);
+  }
+  void WriteMemory(u32 address, u8 value) override
+  {
+    Core::System::GetInstance().GetDSP().WriteARAM(value, address);
+  }
 };
 
 static std::unique_ptr<Accelerator> s_accelerator = std::make_unique<HLEAccelerator>();
@@ -411,7 +424,14 @@ void ProcessVoice(PB_TYPE& pb, const AXBuffers& buffers, u16 count, AXMixControl
   // Apply a global volume ramp using the volume envelope parameters.
   for (u32 i = 0; i < count; ++i)
   {
-    const s32 sample = ((s32)samples[i] * pb.vol_env.cur_volume) >> 15;
+#ifdef AX_GC
+    // signed on GameCube
+    const s32 volume = (s16)pb.vol_env.cur_volume;
+#else
+    // unsigned on Wii
+    const s32 volume = (u16)pb.vol_env.cur_volume;
+#endif
+    const s32 sample = ((s32)samples[i] * volume) >> 15;
     samples[i] = std::clamp(sample, -32767, 32767);  // -32768 ?
     pb.vol_env.cur_volume += pb.vol_env.cur_volume_delta;
   }

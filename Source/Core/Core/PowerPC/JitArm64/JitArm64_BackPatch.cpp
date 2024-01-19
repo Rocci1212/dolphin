@@ -16,7 +16,6 @@
 #include "Common/StringUtil.h"
 #include "Common/Swap.h"
 
-#include "Core/HW/Memmap.h"
 #include "Core/PowerPC/Gekko.h"
 #include "Core/PowerPC/JitArm64/Jit_Util.h"
 #include "Core/PowerPC/JitArmCommon/BackPatch.h"
@@ -60,19 +59,22 @@ void JitArm64::EmitBackpatchRoutine(u32 flags, MemAccessMode mode, ARM64Reg RS, 
 {
   const u32 access_size = BackPatchInfo::GetFlagSize(flags);
 
-  const bool emit_fastmem = mode != MemAccessMode::AlwaysSafe;
-  const bool emit_slowmem = mode != MemAccessMode::AlwaysUnsafe;
+  if (m_accurate_cpu_cache_enabled)
+    mode = MemAccessMode::AlwaysSlowAccess;
+
+  const bool emit_fast_access = mode != MemAccessMode::AlwaysSlowAccess;
+  const bool emit_slow_access = mode != MemAccessMode::AlwaysFastAccess;
 
   bool in_far_code = false;
-  const u8* fastmem_start = GetCodePtr();
-  std::optional<FixupBranch> slowmem_fixup;
+  const u8* fast_access_start = GetCodePtr();
+  std::optional<FixupBranch> slow_access_fixup;
 
-  if (emit_fastmem)
+  if (emit_fast_access)
   {
     ARM64Reg memory_base = MEM_REG;
     ARM64Reg memory_offset = addr;
 
-    if (!jo.fastmem_arena)
+    if (!jo.fastmem)
     {
       const ARM64Reg temp = emitting_routine ? ARM64Reg::W3 : ARM64Reg::W30;
 
@@ -82,21 +84,21 @@ void JitArm64::EmitBackpatchRoutine(u32 flags, MemAccessMode mode, ARM64Reg RS, 
       LSR(temp, addr, PowerPC::BAT_INDEX_SHIFT);
       LDR(memory_base, MEM_REG, ArithOption(temp, true));
 
-      if (emit_slowmem)
+      if (emit_slow_access)
       {
         FixupBranch pass = CBNZ(memory_base);
-        slowmem_fixup = B();
+        slow_access_fixup = B();
         SetJumpTarget(pass);
       }
 
       AND(memory_offset, addr, LogicalImm(PowerPC::BAT_PAGE_SIZE - 1, 64));
     }
-    else if (emit_slowmem && emitting_routine)
+    else if (emit_slow_access && emitting_routine)
     {
       const ARM64Reg temp1 = flags & BackPatchInfo::FLAG_STORE ? ARM64Reg::W0 : ARM64Reg::W3;
       const ARM64Reg temp2 = ARM64Reg::W2;
 
-      slowmem_fixup = CheckIfSafeAddress(addr, temp1, temp2);
+      slow_access_fixup = CheckIfSafeAddress(addr, temp1, temp2);
     }
 
     if ((flags & BackPatchInfo::FLAG_STORE) && (flags & BackPatchInfo::FLAG_FLOAT))
@@ -145,27 +147,27 @@ void JitArm64::EmitBackpatchRoutine(u32 flags, MemAccessMode mode, ARM64Reg RS, 
       ByteswapAfterLoad(this, &m_float_emit, RS, RS, flags, true, false);
     }
   }
-  const u8* fastmem_end = GetCodePtr();
+  const u8* fast_access_end = GetCodePtr();
 
-  if (emit_slowmem)
+  if (emit_slow_access)
   {
     const bool memcheck = jo.memcheck && !emitting_routine;
 
-    if (emit_fastmem)
+    if (emit_fast_access)
     {
       in_far_code = true;
       SwitchToFarCode();
 
-      if (jo.fastmem_arena && !emitting_routine)
+      if (jo.fastmem && !emitting_routine)
       {
-        FastmemArea* fastmem_area = &m_fault_to_handler[fastmem_end];
-        fastmem_area->fastmem_code = fastmem_start;
-        fastmem_area->slowmem_code = GetCodePtr();
+        FastmemArea* fastmem_area = &m_fault_to_handler[fast_access_end];
+        fastmem_area->fast_access_code = fast_access_start;
+        fastmem_area->slow_access_code = GetCodePtr();
       }
     }
 
-    if (slowmem_fixup)
-      SetJumpTarget(*slowmem_fixup);
+    if (slow_access_fixup)
+      SetJumpTarget(*slow_access_fixup);
 
     const ARM64Reg temp_gpr = flags & BackPatchInfo::FLAG_LOAD ? ARM64Reg::W30 : ARM64Reg::W0;
     const int temp_gpr_index = DecodeReg(temp_gpr);
@@ -214,32 +216,48 @@ void JitArm64::EmitBackpatchRoutine(u32 flags, MemAccessMode mode, ARM64Reg RS, 
 
       const bool reverse = (flags & BackPatchInfo::FLAG_REVERSE) != 0;
 
+      MOVP2R(ARM64Reg::X2, &m_mmu);
+
       if (access_size == 64)
-        MOVP2R(ARM64Reg::X8, reverse ? &PowerPC::Write_U64_Swap : &PowerPC::Write_U64);
+      {
+        MOVP2R(ARM64Reg::X8,
+               reverse ? &PowerPC::WriteU64SwapFromJitArm64 : &PowerPC::WriteU64FromJitArm64);
+      }
       else if (access_size == 32)
-        MOVP2R(ARM64Reg::X8, reverse ? &PowerPC::Write_U32_Swap : &PowerPC::Write_U32);
+      {
+        MOVP2R(ARM64Reg::X8,
+               reverse ? &PowerPC::WriteU32SwapFromJitArm64 : &PowerPC::WriteU32FromJitArm64);
+      }
       else if (access_size == 16)
-        MOVP2R(ARM64Reg::X8, reverse ? &PowerPC::Write_U16_Swap : &PowerPC::Write_U16);
+      {
+        MOVP2R(ARM64Reg::X8,
+               reverse ? &PowerPC::WriteU16SwapFromJitArm64 : &PowerPC::WriteU16FromJitArm64);
+      }
       else
-        MOVP2R(ARM64Reg::X8, &PowerPC::Write_U8);
+      {
+        MOVP2R(ARM64Reg::X8, &PowerPC::WriteU8FromJitArm64);
+      }
 
       BLR(ARM64Reg::X8);
     }
     else if (flags & BackPatchInfo::FLAG_ZERO_256)
     {
-      MOVP2R(ARM64Reg::X8, &PowerPC::ClearCacheLine);
+      MOVP2R(ARM64Reg::X1, &m_mmu);
+      MOVP2R(ARM64Reg::X8, &PowerPC::ClearDCacheLineFromJitArm64);
       BLR(ARM64Reg::X8);
     }
     else
     {
+      MOVP2R(ARM64Reg::X1, &m_mmu);
+
       if (access_size == 64)
-        MOVP2R(ARM64Reg::X8, &PowerPC::Read_U64);
+        MOVP2R(ARM64Reg::X8, &PowerPC::ReadU64FromJitArm64);
       else if (access_size == 32)
-        MOVP2R(ARM64Reg::X8, &PowerPC::Read_U32);
+        MOVP2R(ARM64Reg::X8, &PowerPC::ReadU32FromJitArm64);
       else if (access_size == 16)
-        MOVP2R(ARM64Reg::X8, &PowerPC::Read_U16);
+        MOVP2R(ARM64Reg::X8, &PowerPC::ReadU16FromJitArm64);
       else
-        MOVP2R(ARM64Reg::X8, &PowerPC::Read_U8);
+        MOVP2R(ARM64Reg::X8, &PowerPC::ReadU8FromJitArm64);
 
       BLR(ARM64Reg::X8);
     }
@@ -286,7 +304,7 @@ void JitArm64::EmitBackpatchRoutine(u32 flags, MemAccessMode mode, ARM64Reg RS, 
 
   if (in_far_code)
   {
-    if (slowmem_fixup)
+    if (slow_access_fixup)
     {
       FixupBranch done = B();
       SwitchToNearCode();
@@ -300,19 +318,8 @@ void JitArm64::EmitBackpatchRoutine(u32 flags, MemAccessMode mode, ARM64Reg RS, 
   }
 }
 
-bool JitArm64::HandleFastmemFault(uintptr_t access_address, SContext* ctx)
+bool JitArm64::HandleFastmemFault(SContext* ctx)
 {
-  if (!(access_address >= (uintptr_t)Memory::physical_base &&
-        access_address < (uintptr_t)Memory::physical_base + 0x100010000) &&
-      !(access_address >= (uintptr_t)Memory::logical_base &&
-        access_address < (uintptr_t)Memory::logical_base + 0x100010000))
-  {
-    ERROR_LOG_FMT(DYNA_REC,
-                  "Exception handler - access below memory space. PC: {:#018x} {:#018x} < {:#018x}",
-                  ctx->CTX_PC, access_address, (uintptr_t)Memory::physical_base);
-    return false;
-  }
-
   const u8* pc = reinterpret_cast<const u8*>(ctx->CTX_PC);
   auto slow_handler_iter = m_fault_to_handler.upper_bound(pc);
 
@@ -320,7 +327,7 @@ bool JitArm64::HandleFastmemFault(uintptr_t access_address, SContext* ctx)
   if (slow_handler_iter == m_fault_to_handler.end())
     return false;
 
-  const u8* fastmem_area_start = slow_handler_iter->second.fastmem_code;
+  const u8* fastmem_area_start = slow_handler_iter->second.fast_access_code;
   const u8* fastmem_area_end = slow_handler_iter->first;
 
   // no overlapping fastmem area found
@@ -330,7 +337,7 @@ bool JitArm64::HandleFastmemFault(uintptr_t access_address, SContext* ctx)
   const Common::ScopedJITPageWriteAndNoExecute enable_jit_page_writes;
   ARM64XEmitter emitter(const_cast<u8*>(fastmem_area_start), const_cast<u8*>(fastmem_area_end));
 
-  emitter.BL(slow_handler_iter->second.slowmem_code);
+  emitter.BL(slow_handler_iter->second.slow_access_code);
 
   while (emitter.GetCodePtr() < fastmem_area_end)
     emitter.NOP();
