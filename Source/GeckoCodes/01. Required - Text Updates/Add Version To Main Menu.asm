@@ -1,6 +1,6 @@
 #To be inserted at 803014AC
 # Used at [$Required: Text Updates] at R4QP01.ini
-  # PUSH r14-r31 INTO THE STACK (not 100% sure this is safe)
+  # push r14-r31 into the stack
   stwu sp, -0x0050 (sp)  # make space for 18 registers
   stmw r14, 0x8 (sp)     # push r14-r31 onto the stack pointer
   mflr r31 # back the value of the link register up
