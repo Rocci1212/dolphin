@@ -3,81 +3,65 @@
   # PUSH r14-r31 INTO THE STACK (not 100% sure this is safe)
   stwu sp, -0x0050 (sp)  # make space for 18 registers
   stmw r14, 0x8 (sp)     # push r14-r31 onto the stack pointer
+  mflr r31 # back the value of the link register up
 
-  mr r14, r0
-  addi r14, r14, 0x4000
-  addi r14, r14, 0x4000  # add 8000 to get us to the right spot in memory
-  mr r15, r14            # save register to be further manipulated
+  lis r30, 0x80c2
+  lwz r30, 0x29d0 (r30)  # Load text pointer into r30
+  lis r28, 0x9000
+  cmpw r30, r28
+  blt END  
 
-  lis r23, 0x53          # S
-  ori r23, r23, 0x50     # P
-  lis r24, 0x4F          # O
-  ori r24, r24, 0x4F     # O
-  lis r25, 0x4B          # K
-  ori r25, r25, 0x59     # Y
-  lis r26, 0x20          # Space
-  ori r26, r26, 0x4D     # M
-  lis r27, 0x53          # S
-  ori r27, r27, 0x43     # C
-  lis r28, 0x20          # Space
-  ori r28, r28, 0x76     # v
-  lis r29, 0x30          # 0
-  ori r29, r29, 0x2e     # .
-  lis r30, 0x34          # 4
-  ori r30, r30, 0x2e     # .
-  lis r31, 0x37          # 7
+  lis r29, 0	 # r29 will count the number of the string you're writing
 
-  stmw r23, 0xcea (r14)
+  ### Load location of "SELECT ANY OF THE SEVEN ICONS..." text ###
+  lis r14, 0
+  ori r14, r14, 0x8cea  # set r14 to it's new offset (0x18442, offset of "POWER SHORTAGE" text)
+  add r14, r30, r14     # r14 = text pointer + offset of the text we want to edit
 
-  addi r15, r15, 0x6000  
-  addi r15, r15, 0x6000  
-  addi r15, r15, 0x4000  # add 18000 to r0 to get us to the right spot in memory
-  mr r16, r15            # save register to be further manipulated
-  
-  lis r26, 0x43          # C
-  ori r26, r26, 0x53     # S
-  lis r27, 0x4c          # L
-  ori r27, r27, 0x20     # Space
-  lis r28, 0x53          # S
-  ori r28, r28, 0x54     # T
-  lis r29, 0x41          # A
-  ori r29, r29, 0x44     # D
-  lis r30, 0x49          # I
-  ori r30, r30, 0x41     # A
-  lis r31, 0             # Terminator
+  bl BRANCH_LINK_1
+  .long 0x53504F4F 		# SPOO
+  .long 0x4B59204D 		# KY M
+  .long 0x53432076 		# SC v
+  .long 0x302E342E 		# 0.4.	
+  .long 0x37004353 		# 7(null)CS
+  .long 0x4C205354   # L ST
+  .long 0x41444941   # ADIA
+  .long 0x004F5249   # (null)ORI
+  .long 0x47494E41   # GINA
+  .long 0x4C204649   # L FI
+  .long 0x454C4420   # ELD 
+  .long 0x53504545   # SPEE
+  .long 0x44530000   # DS(null)
 
-  stmw r26, 0x442 (r15)
-  
-  addi r16, r16, 0x6000  
-  addi r16, r16, 0x6000  
-  addi r16, r16, 0x4000  # add 28000 to r0 to get us to the right spot in memory
-  
-  lis r21, 0x4f          # O
-  ori r21, r21, 0x52     # R
-  lis r22, 0x49          # I
-  ori r22, r22, 0x47     # G
-  lis r23, 0x49          # I
-  ori r23, r23, 0x4e     # N
-  lis r24, 0x41          # A
-  ori r24, r24, 0x4C     # L
-  lis r25, 0x20          # Space
-  ori r25, r25, 0x46     # F
-  lis r26, 0x49          # I
-  ori r26, r26, 0x45     # E
-  lis r27, 0x4C          # L
-  ori r27, r27, 0x44     # D
-  lis r28, 0x20          # Space
-  ori r28, r28, 0x53     # S
-  lis r29, 0x50          # P
-  ori r29, r29, 0x45     # E
-  lis r30, 0x45          # E
-  ori r30, r30, 0x44     # D
-  lis r31, 0x53          # S
+  BRANCH_LINK_1:
+  mflr r17           
 
-  stmw r21, 0xeca (r16)
+  NEXT_STRING:  
+  addi r29, r29, 1   # Increment r29 so the code knows which offset to load when the loop has ended
 
+  TEXT_LOOP_1:
+  lbz r18, 0 (r17)   # LOAD the next character from the branch link trick
+  addi r17, r17, 1   # INCREMENT r17 by 1 to point to the next character of the branch link trick
+  sth r18, 0 (r14)   # STORE a null followed by the character in the place you need to store it
+  addi r14, r14, 2   # INCREMENT r14 by 2 to point to the next address you need to write on
+  cmpwi cr2, r18, 0  # check if last character was a null. if so, EXIT the loop
+  bne cr2, TEXT_LOOP_1  
+
+  ### Load location of "POWER SHORTAGE" text ###
+  lis r14, 1
+  ori r14, r14, 0x8442  # set r14 to it's new offset (0x18442, offset of "POWER SHORTAGE" text)
+  add r14, r30, r14     # r14 = text pointer + offset of the text we want to edit
+  cmpwi r29, 1
+  beq NEXT_STRING
+  ### Load location of "ELECTRIC FENCE DOESN'T HURT PLAYERS" text ###
+  lis r14, 2
+  ori r14, r14, 0x8eca  # set r14 to it's new offset (0x28eca, offset of "ELECTRIC FENCE DOESN'T HURT PLAYERS" text)
+  add r14, r30, r14     # r14 = text pointer + offset of the text we want to edit
+  cmpwi r29, 2
+  beq NEXT_STRING
+
+  END:
+  mtlr r31 # restore the value of the link register back
   lmw r14, 0x8 (sp)      # pop r14-r31 off the stack pointer
   addi sp, sp, 0x0050    # release the space
   lwz r0, 20 (r1)        # original instruction at 803014AC
-
-
